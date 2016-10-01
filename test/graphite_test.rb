@@ -51,7 +51,7 @@ class Graphite::Test < ActiveSupport::TestCase
   end
 
   test "create a blog" do
-    schema_query('mutation createBlog { createBlog(input: {name: "test", author_id: 2}) { blog { id } } }')
+    schema_query('mutation { createBlog(input: {name: "test", author_id: 2}) { blog { id } } }')
   end
 
   test "update a blog" do

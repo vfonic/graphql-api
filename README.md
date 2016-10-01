@@ -25,7 +25,7 @@ query { blog(id: 1) { id, title, author { name } } }
 
 query { blogs(limit: 5) { id, title, author { name } } }
 
-mutation { createBlog { createBlog(input: {title: "test", author_id: 2}) { blog { id } } }
+mutation { createBlog(input: {name: "test", author_id: 2}) { blog { id } } }
 
 mutation { updateBlog(input: {id: 1, title: "test"}) { blog { id } } }
 
