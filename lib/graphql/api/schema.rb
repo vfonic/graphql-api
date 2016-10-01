@@ -1,12 +1,12 @@
+require 'graphql/api/command_type'
+require 'graphql/api/query_type'
+require 'graphql/api/helpers'
+require 'graphql/api/schema_error'
 require 'graphql'
-require 'graphite/command_type'
-require 'graphite/query_type'
-require 'graphite/helpers'
-require 'graphite/schema_error'
 
-include Graphite::Helpers
+include GraphQL::Api::Helpers
 
-module Graphite
+module GraphQL::Api
   class Schema
 
     def initialize(commands: [], queries: [], models: [])

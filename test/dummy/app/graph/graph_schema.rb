@@ -1,1 +1,1 @@
-GraphSchema = Graphite::Schema.new.schema
+GraphSchema = GraphQL::Api::Schema.new.schema

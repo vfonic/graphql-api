@@ -1,4 +1,4 @@
-module Graphite
+module GraphQL::Api
   class QueryType
     attr_accessor :ctx, :inputs
 

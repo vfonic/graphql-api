@@ -1,4 +1,4 @@
-class BlogCreateCommand < Graphite::CommandType
+class BlogCreateCommand < GraphQL::Api::CommandType
   inputs name: :string, tags: [:string]
   returns blog: Blog
 

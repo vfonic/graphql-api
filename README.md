@@ -1,7 +1,7 @@
-# Graphite
-Graphite is a graphql framework for Rails that supports auto generating 
-queries based on Active Record models and plain Ruby objects. Don't 
-manually define Graphql structures, let Graphite handle it for you.
+# GraphQL-Api
+GraphQL-Api is an opinionated Graphql framework for Rails that supports 
+auto generating queries based on Active Record models and plain Ruby 
+objects.
 
 ## Example
 
@@ -19,7 +19,7 @@ class Blog < ActiveRecord::Base
 end
 ```
 
-Graphite will respond to the following queries for the blog resource:
+GraphQL-Api will respond to the following queries for the blog resource:
 
 ```graphql
 query { blog(id: 1) { id, title, author { name } } }
@@ -33,12 +33,12 @@ mutation { updateBlog(input: {id: 1, title: "test"}) { blog { id } } }
 mutation { deleteBlog(input: {id: 1}) { blog_id } }
 ```
 
-Graphite also has support for command objects:
+GraphQL-Api also has support for command objects:
 ```ruby
 # Graphql mutation derived from the below command object:
 # mutation { blogCreateCommand(input: {tags: ["test", "testing"], name: "hello"}) { blog { id, tags { name } } } }
 
-class BlogCreateCommand < Graphite::CommandType
+class BlogCreateCommand < GraphQL::Api::CommandType
   inputs name: :string, tags: [:string]
   returns blog: Blog
 
@@ -55,7 +55,7 @@ end
 # Graphql query derived from the below query object:
 # query { blogQuery(content_matches: ["name"]) { id, name } }
 
-class BlogQuery < Graphite::QueryType
+class BlogQuery < GraphQL::Api::QueryType
   arguments name: :string, content_matches: [:string]
   return_type [Blog]
 
@@ -76,11 +76,11 @@ end
 
 ### Endpoint
 
-Creating an endpoint for Graphite.
+Creating an endpoint for GraphQL-Api.
 
 ```ruby
 # inside an initializer or other file inside the load path
-GraphSchema = Graphite::Schema.new.schema
+GraphSchema = GraphQL::Api::Schema.new.schema
 
 # controllers/graphql_controller.rb
 class GraphqlController < ApplicationController
@@ -104,7 +104,7 @@ end
 
 ### Authorization
 
-Graphite will check for an `access_<field>?(ctx)` method on all model 
+GraphQL-Api will check for an `access_<field>?(ctx)` method on all model 
 objects before returning the  value. If this method returns false, the 
 value will be `nil`.
 
@@ -138,32 +138,32 @@ all authorization logic from the model.
 
 ### Querying
 
-Instantiate an instance of Graphite and get the `schema` object which is
+Instantiate an instance of GraphQL-Api and get the `schema` object which is
 a `GraphQL::Schema` instance from [graphql-ruby](https://rmosolgo.github.io/graphql-ruby).
 
 ```ruby
-graphite = Graphite::Schema.new(commands: [], models: [], queries: [])
-graphite.schema.execute('query { ... }')
+graph = GraphQL::Api::Schema.new(commands: [], models: [], queries: [])
+graph.schema.execute('query { ... }')
 ```
 
-Graphite will load in all models, query objects and commands from the rails
+GraphQL-Api will load in all models, query objects and commands from the rails
 app directory automatically. If you store these in a different location
 you can pass them in directly to the new command.
 
 ### Model Objects
 
-Model objects are the core return value from Graphite. They can be a plain
+Model objects are the core return value from GraphQL-Api. They can be a plain
 old ruby object or they can be an active record model. Active record models
 have more automatic inference, whereas poro objects are more flexible.
 
 #### Active Record
 
-Graphite reads your associations and columns from your models and creates
+GraphQL-Api reads your associations and columns from your models and creates
 a graphql schema from them. In the examples above you can see that 'Author'
 is automatically accessible from the 'Blog' object because the belongs to
 relationship is set up. Column types are also inferred.
 
-Graphite will set up two queries on the main Graphql query object. One for
+GraphQL-Api will set up two queries on the main Graphql query object. One for
 a single record and another for a collection. You can override these queries
 by setting a `graph_find(args, ctx)` and `graph_where(args, ctx)` class 
 methods on your model. The `ctx` parameter will contain the context passed
@@ -184,7 +184,7 @@ They take a set of inputs as well as a graphql context and provide a
 `perform` method that returns a Graphql understandable type. These objects
 give you an object oriented abstraction for handling mutations.
 
-Command objects must implement the interface defined in `Graphite::CommandType`
+Command objects must implement the interface defined in `GraphQL::Api::CommandType`
 
 ### Query Objects
 
@@ -192,13 +192,13 @@ Query objects are designed to provide a wrapper around complex queries
 with potentially a lot of inputs. They return a single type or array of
 types.
 
-Query objects must implement the interface defined in `Graphite::QueryType`
+Query objects must implement the interface defined in `GraphQL::Api::QueryType`
 
 ### Customization
 
-Sometimes you cannot fit every possible use case into a library like Graphite
+Sometimes you cannot fit every possible use case into a library like GraphQL-Api
 as a result, you can always drop down to the excellent Graphql library for
-ruby to combine both hand rolled and Graphite graphql schemas. Here is an
+ruby to combine both hand rolled and GraphQL-Api graphql schemas. Here is an
 example creating a custom mutation.
 
 ```ruby
@@ -208,16 +208,16 @@ simple_mutation = GraphQL::Relay::Mutation.define do
   resolve -> (inputs, ctx) {  {item: 'hello'}  }
 end
 
-graphite = Graphite::Schema.new
-mutation = graphite.mutation do
+graph = GraphQL::Api::Schema.new
+mutation = graph.mutation do
   field 'simpleMutation', simple_mutation.field
 end
 
-schema = GraphQL::Schema.define(query: graphite.query, mutation: mutation)
+schema = GraphQL::Schema.define(query: graph.query, mutation: mutation)
 puts schema.execute('mutation { simpleMutation(input: {name: "hello"}) { item } }')
 ```
 
-The `Graphite::Schema#mutation` and `Graphite::Schema#query` methods accept
+The `GraphQL::Api::Schema#mutation` and `GraphQL::Api::Schema#query` methods accept
 a block that allows you to add custom fields or methods to the mutation or
 query definitions. You can refer to the [graphql-ruby](https://rmosolgo.github.io/graphql-ruby)
 docs for how to do this.
@@ -250,6 +250,7 @@ Note, these are the same as active record's column types for consistency.
 
 ## Roadmap
 
+- [ ] Customizing resolvers
 - [ ] Relay support
 - [ ] Additional object support (enums, interfaces ...)
 - [ ] Support non rails frameworks

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    graphite (0.1.0)
+    graphql-api (0.1.0)
       graphql
       rails (~> 5.0.0, >= 5.0.0.1)
 
@@ -51,7 +51,7 @@ GEM
     erubis (2.7.0)
     globalid (0.3.7)
       activesupport (>= 4.1.0)
-    graphql (0.18.15)
+    graphql (0.19.0)
     i18n (0.7.0)
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
@@ -115,7 +115,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  graphite!
+  graphql-api!
   sqlite3
 
 BUNDLED WITH

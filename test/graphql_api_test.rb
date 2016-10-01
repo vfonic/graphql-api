@@ -1,9 +1,9 @@
 require 'test_helper'
 
-class Graphite::Test < ActiveSupport::TestCase
+class GraphQL::Api::Test < ActiveSupport::TestCase
 
   def schema
-    Graphite::Schema.new.schema
+    GraphQL::Api::Schema.new.schema
   end
 
   setup do
@@ -93,7 +93,7 @@ class Graphite::Test < ActiveSupport::TestCase
       resolve -> (inputs, ctx) {  {item: 'hello'}  }
     end
 
-    graphite = Graphite::Schema.new
+    graphite = GraphQL::Api.graph
     mutation = graphite.mutation do
       field 'simpleMutation', simple_mutation.field
     end

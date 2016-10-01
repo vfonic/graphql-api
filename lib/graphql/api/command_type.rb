@@ -1,4 +1,4 @@
-module Graphite
+module GraphQL::Api
   class CommandType
     attr_accessor :ctx, :inputs
 

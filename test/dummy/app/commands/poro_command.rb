@@ -1,4 +1,4 @@
-class PoroCommand < Graphite::CommandType
+class PoroCommand < GraphQL::Api::CommandType
   inputs name: :string!
   returns poro: Poro
 

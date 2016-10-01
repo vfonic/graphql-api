@@ -1,4 +1,4 @@
-class BlogQuery < Graphite::QueryType
+class BlogQuery < GraphQL::Api::QueryType
   arguments name: :string, content_matches: [:string], reqs: :string!
   return_type [Blog]
 

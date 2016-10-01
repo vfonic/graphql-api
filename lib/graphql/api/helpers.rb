@@ -1,6 +1,6 @@
-require 'graphite/schema_error'
+require 'graphql/api/schema_error'
 
-module Graphite
+module GraphQL::Api
   module Helpers
     def all_constants(root)
       begin
