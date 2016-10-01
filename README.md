@@ -74,6 +74,34 @@ end
 
 ## Guides
 
+### Endpoint
+
+Creating an endpoint for Graphite.
+
+```ruby
+# initializer or app file
+GraphSchema = Graphite::Schema.new.schema
+
+# controllers/graphql_controller.rb
+class GraphqlController < ApplicationController
+
+  # needed by the relay framework, defines the graphql schema
+  def index
+    render json: GraphSchema.execute(GraphQL::Introspection::INTROSPECTION_QUERY)
+  end
+
+  # will respond to graphql requests and pass through the current user
+  def create
+    render json: GraphSchema.execute(
+        params[:query], 
+        variables: params[:variables] || {}, 
+        context: {current_user: current_user}
+    )
+  end
+  
+end
+```
+
 ### Authorization
 
 Graphite will check for an `access_<field>?(ctx)` method on all model 
@@ -115,7 +143,7 @@ a `GraphQL::Schema` instance from [graphql-ruby](https://rmosolgo.github.io/grap
 
 ```ruby
 graphite = Graphite::Schema.new(commands: [], models: [], queries: [])
-graphite.execute('query { ... }')
+graphite.schema.execute('query { ... }')
 ```
 
 Graphite will load in all models, query objects and commands from the rails

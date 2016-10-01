@@ -3,6 +3,7 @@ class PoroCommand < Graphite::CommandType
   returns poro: Poro
 
   def perform
+    puts "current user: #{ctx[:current_user]}"
     {poro: Poro.new(inputs[:name])}
   end
 

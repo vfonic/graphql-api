@@ -241,7 +241,7 @@ module Graphite
       mutations = @mutations
 
       @mutation ||= GraphQL::ObjectType.define do
-
+        name 'Mutation'
         instance_eval(&block) if block
 
         mutations.each do |model_class, muts|
