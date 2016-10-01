@@ -11,12 +11,12 @@ module Graphite
       @arguments || []
     end
 
-    def self.fields(fields=nil)
-      @fields = fields if fields
-      @fields || []
+    def self.return_type(type=nil)
+      @return_type = type if type
+      @return_type
     end
 
-    def query
+    def execute
     end
 
   end

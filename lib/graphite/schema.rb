@@ -75,18 +75,12 @@ module Graphite
       end
     end
 
-    def create_query_type(query_class)
-      GraphQL::ObjectType.define do
-        name query_class.name
-
-        query_class.fields.each do |field_name, field_type|
-          field field_name, graphql_type_of(field_type)
-        end
-      end
-    end
-
     def create_command_type(object_type)
       object_types = @types
+
+      if object_type.return_field.nil?
+        raise SchemaError.new("return field is nil for command: #{object_type.name}")
+      end
 
       GraphQL::Relay::Mutation.define do
         name object_type.name
@@ -96,19 +90,7 @@ module Graphite
           input_field input, graphql_type_of(type)
         end
 
-        if object_type.return_type.nil?
-          raise SchemaError.new("return type is nil for command: #{object_type.name}")
-        end
-
-        if object_type.return_field.nil?
-          raise SchemaError.new("return field is nil for command: #{object_type.name}")
-        end
-
-        if object_type.return_type.respond_to?(:to_sym) || object_type.return_type.is_a?(Array)
-          return_field object_type.return_field, graphql_type_of(object_type.return_type.to_sym)
-        else
-          return_field object_type.return_field, object_types[object_type.return_type]
-        end
+        return_field object_type.return_field, graphql_type_for_object(object_type, object_types)
 
         resolve -> (inputs, ctx) {
           {object_type.return_field => object_type.new(inputs, ctx).perform}
@@ -188,22 +170,7 @@ module Graphite
         description 'The query root for this schema'
 
         object_types.each do |object_class, graph_type|
-          if object_class < QueryType
-
-            field(object_class.name.underscore.to_sym) do
-              type(graph_type)
-              object_class.arguments.each do |argument_name, argument_type|
-                argument argument_name, graphql_type_of(argument_type)
-              end
-
-              resolve -> (obj, args, ctx) {
-                q = object_class.new(args, ctx)
-                q.query
-                q
-              }
-            end
-
-          elsif object_class < ActiveRecord::Base
+          if object_class < ActiveRecord::Base
 
             field(object_class.name.camelize(:lower)) do
               type graph_type
@@ -216,8 +183,8 @@ module Graphite
               end
 
               resolve -> (obj, args, ctx) {
-                if object_class.respond_to?(:find_with_ctx)
-                  object_class.find_with_ctx(args, ctx)
+                if object_class.respond_to?(:graph_find)
+                  object_class.graph_find(args, ctx)
                 else
                   object_class.find_by!(args.to_h)
                 end
@@ -235,8 +202,8 @@ module Graphite
               end
 
               resolve -> (obj, args, ctx) {
-                if object_class.respond_to?(:where_with_ctx)
-                  object_class.where_with_ctx(args, ctx)
+                if object_class.respond_to?(:graph_where)
+                  object_class.graph_where(args, ctx)
                 else
                   eager_load = []
                   ctx.irep_node.children.each do |child|
@@ -252,6 +219,21 @@ module Graphite
                 end
               }
             end
+
+          elsif object_class.respond_to?(:arguments) && object_class.respond_to?(:return_type)
+
+            field(object_class.name.camelize(:lower)) do
+              type(graphql_type_for_object(object_class, object_types))
+
+              object_class.arguments.each do |argument_name, argument_type|
+                argument argument_name, graphql_type_of(argument_type)
+              end
+
+              resolve -> (obj, args, ctx) {
+                object_class.new(args, ctx).execute
+              }
+            end
+
           end
         end
 
@@ -260,18 +242,11 @@ module Graphite
 
     def mutation
       mutations = @mutations
-      object_types = @types
 
       @mutation ||= GraphQL::ObjectType.define do
         mutations.each do |model_class, muts|
           muts.each do |mutation|
             field mutation[0], field: mutation[1].field
-          end
-        end
-
-        object_types.each do |object_class, object_type|
-          if object_class < CommandType
-            field object_class.name.camelize(:lower), field: object_type.field
           end
         end
       end
@@ -286,8 +261,7 @@ module Graphite
     end
 
     def build_object_types
-      all_commands.each { |command| @types[command] = create_command_type(command) }
-      all_queries.each { |query| @types[query] = create_query_type(query) }
+      all_queries.each { |query| @types[query] = nil }
     end
 
     def build_mutations
@@ -297,6 +271,12 @@ module Graphite
             ["update#{model_class.name}", update_mutation(model_class)],
             ["delete#{model_class.name}", delete_mutation(model_class)],
         ].map { |x| x if x[1] }.compact
+      end
+
+      all_commands.each do |command|
+        @mutations[command] = [
+            [command.name.camelize(:lower), create_command_type(command)]
+        ]
       end
     end
 

@@ -6,8 +6,5 @@ module Graphite
       @fields || []
     end
 
-    def query
-    end
-
   end
 end

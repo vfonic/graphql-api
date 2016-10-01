@@ -14,6 +14,26 @@ module Graphite
       end
     end
 
+    def graphql_type_for_object(object_class, object_types)
+      if object_class.return_type.nil?
+        raise SchemaError.new("return type is nil for object: #{object_class.name}")
+      end
+
+      if object_class.return_type.respond_to?(:to_sym) || (object_class.return_type.is_a?(Array) && object_class.return_type[0].respond_to?(:to_sym))
+        type = graphql_type_of(object_class.return_type.to_sym)
+      elsif object_class.return_type.is_a?(Array)
+        type = object_types[object_class.return_type[0]].to_list_type
+      else
+        type = object_types[object_class.return_type]
+      end
+
+      if type.nil?
+        raise SchemaError.new("could not parse return type for: #{object_class.name}, #{object_class.return_type}")
+      end
+
+      type
+    end
+
     def graphql_type_of(type)
       is_list = false
       if type.is_a?(Array)

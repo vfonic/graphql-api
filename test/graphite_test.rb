@@ -18,14 +18,24 @@ class Graphite::Test < ActiveSupport::TestCase
     end
   end
 
-  def schema_query(query)
+  def schema_query(query, opts={})
     res = schema.execute(query)
     assert_nil res['errors'], res['errors']
+
+    if opts[:print]
+      puts res
+    end
+    res
   end
 
   # Models
   test "read blog" do
     schema_query("query { blog(id: #{Blog.first.id}) { id, name } }")
+  end
+
+  test "cannot read blog name" do
+    data = schema_query("query { blog(id: #{Blog.first.id}) { id, name } }")
+    assert_nil data['data']['blog']['name']
   end
 
   test "read multiple blogs" do
@@ -59,6 +69,11 @@ class Graphite::Test < ActiveSupport::TestCase
 
   test "mutation poro return" do
     schema_query('mutation { poroCommand(input: {name: "foobar"}) { poro { name } } }')
+  end
+
+  # Queries
+  test "query blog return" do
+    schema_query('query { blogQuery(content_matches: ["name"]) { id, name } }')
   end
 
 end
