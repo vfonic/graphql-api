@@ -251,6 +251,7 @@ Note, these are the same as active record's column types for consistency.
 ## Roadmap
 
 - [ ] Customizing resolvers
+- [ ] CanCan support
 - [ ] Relay support
 - [ ] Additional object support (enums, interfaces ...)
 - [ ] Support non rails frameworks
