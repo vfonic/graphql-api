@@ -1,6 +1,6 @@
 class BlogCreateCommand < Graphite::CommandType
   inputs name: :string, tags: [:string]
-  returns :blog, Blog
+  returns blog: Blog
 
   def perform
     blog = Blog.create!(name: inputs[:name], author_id: Author.first.id)
@@ -9,7 +9,7 @@ class BlogCreateCommand < Graphite::CommandType
       blog.blog_tags.create!(tag_id: t.id)
     end
 
-    blog
+    {blog: blog}
   end
 
 end

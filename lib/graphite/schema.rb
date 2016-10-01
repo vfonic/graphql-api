@@ -20,9 +20,6 @@ module Graphite
       build_model_types
       build_mutations
       build_object_types
-      mutation
-      query
-      self
     end
 
     def all_models
@@ -78,10 +75,6 @@ module Graphite
     def create_command_type(object_type)
       object_types = @types
 
-      if object_type.return_field.nil?
-        raise SchemaError.new("return field is nil for command: #{object_type.name}")
-      end
-
       GraphQL::Relay::Mutation.define do
         name object_type.name
         description "Command #{object_type.name}"
@@ -90,10 +83,12 @@ module Graphite
           input_field input, graphql_type_of(type)
         end
 
-        return_field object_type.return_field, graphql_type_for_object(object_type, object_types)
+        object_type.returns.each do |return_name, return_type|
+          return_field return_name, graphql_type_for_object(return_type, object_types)
+        end
 
         resolve -> (inputs, ctx) {
-          {object_type.return_field => object_type.new(inputs, ctx).perform}
+          object_type.new(inputs, ctx).perform
         }
       end
     end
@@ -162,12 +157,14 @@ module Graphite
       end
     end
 
-    def query
+    def query(&block)
       object_types = @types
 
       @query ||= GraphQL::ObjectType.define do
         name 'Query'
         description 'The query root for this schema'
+
+        instance_eval(&block) if block
 
         object_types.each do |object_class, graph_type|
           if object_class < ActiveRecord::Base
@@ -223,7 +220,7 @@ module Graphite
           elsif object_class.respond_to?(:arguments) && object_class.respond_to?(:return_type)
 
             field(object_class.name.camelize(:lower)) do
-              type(graphql_type_for_object(object_class, object_types))
+              type(graphql_type_for_object(object_class.return_type, object_types))
 
               object_class.arguments.each do |argument_name, argument_type|
                 argument argument_name, graphql_type_of(argument_type)
@@ -240,10 +237,13 @@ module Graphite
       end
     end
 
-    def mutation
+    def mutation(&block)
       mutations = @mutations
 
       @mutation ||= GraphQL::ObjectType.define do
+
+        instance_eval(&block) if block
+
         mutations.each do |model_class, muts|
           muts.each do |mutation|
             field mutation[0], field: mutation[1].field

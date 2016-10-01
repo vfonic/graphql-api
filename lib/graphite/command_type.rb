@@ -9,22 +9,12 @@ module Graphite
 
     def self.inputs(inputs=nil)
       @inputs = inputs if inputs
-      @inputs || []
+      @inputs || {}
     end
 
-    def self.returns(key, value)
-      return_field(key)
-      return_type(value)
-    end
-
-    def self.return_field(key=nil)
-      @return_key = key if key
-      @return_key
-    end
-
-    def self.return_type(type=nil)
-      @return_type = type if type
-      @return_type
+    def self.returns(fields=nil)
+      @returns = fields if fields
+      @returns || {}
     end
 
     def perform

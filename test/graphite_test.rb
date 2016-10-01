@@ -76,4 +76,21 @@ class Graphite::Test < ActiveSupport::TestCase
     schema_query('query { blogQuery(content_matches: ["name"]) { id, name } }')
   end
 
+
+  test "custom mutation" do
+    simple_mutation = GraphQL::Relay::Mutation.define do
+      input_field :name, !types.String
+      return_field :item, types.String
+      resolve -> (inputs, ctx) {  {item: 'hello'}  }
+    end
+
+    graphite = Graphite::Schema.new
+    mutation = graphite.mutation do
+      field 'simpleMutation', simple_mutation.field
+    end
+
+    schema = GraphQL::Schema.define(query: graphite.query, mutation: mutation)
+    schema.execute('mutation { simpleMutation(input: {name: "hello"}) { item } }')
+  end
+
 end

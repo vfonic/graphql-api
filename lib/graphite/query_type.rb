@@ -1,5 +1,6 @@
 module Graphite
   class QueryType
+    attr_accessor :ctx, :inputs
 
     def initialize(inputs, ctx)
       @inputs = inputs

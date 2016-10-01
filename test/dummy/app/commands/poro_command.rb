@@ -1,9 +1,9 @@
 class PoroCommand < Graphite::CommandType
   inputs name: :string
-  returns :poro, Poro
+  returns poro: Poro
 
   def perform
-    Poro.new(inputs[:name])
+    {poro: Poro.new(inputs[:name])}
   end
 
 end
