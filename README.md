@@ -69,9 +69,8 @@ end
 ## Contents
 
 1. [Guides](#guides)
-    2. [Authorization](#authorization)
-2. [Documentation](#Documentation)
-    1. [Model Objects](#model-objects)
+2. [Documentation](#documentation)
+3. [Roadmap](#roadmap)
 
 ## Guides
 
