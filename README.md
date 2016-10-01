@@ -130,9 +130,8 @@ end
 For more complicated access management, define query objects and Poro's
 with only a subset of fields that can be accessed.
 
-Future work is this area is ongoing. For example, policy objects could be
-used to restrict access and apply scopes for certain users that remove
-all authorization logic from the model.
+Future work is this area is ongoing. For example, a CanCan integration 
+could be a much simpler way of separating out this logic.
 
 ## Documentation
 
