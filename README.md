@@ -200,5 +200,5 @@ docs for how to do this.
 
 ## Roadmap
 
-[ ] Relay support
-[ ] Additional object support (enums, interfaces ...)
+- [ ] Relay support
+- [ ] Additional object support (enums, interfaces ...)
