@@ -202,3 +202,4 @@ docs for how to do this.
 
 - [ ] Relay support
 - [ ] Additional object support (enums, interfaces ...)
+- [ ] Support non rails frameworks
