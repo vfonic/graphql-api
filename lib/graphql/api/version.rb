@@ -1,5 +1,5 @@
 module GraphQL
   module Api
-    VERSION = ''
+    VERSION = '0.1.1'
   end
 end
