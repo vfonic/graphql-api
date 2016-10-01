@@ -172,12 +172,8 @@ passed into the graphql query.
 
 #### Poro
 
-Plain old ruby objects are supported by providing a class method called
-`fields` on the object that should return a hash of key value pairs with
-the key being the field name and the value representing the key type:
-
-    { name: :string }
-
+Plain old ruby objects are supported by implementing a class method called
+`fields` on the object that returns the expected [types](#types) hash. 
 Methods on the Poro should be defined with the same name as the provided
 fields.
 
@@ -225,6 +221,32 @@ The `Graphite::Schema#mutation` and `Graphite::Schema#query` methods accept
 a block that allows you to add custom fields or methods to the mutation or
 query definitions. You can refer to the [graphql-ruby](https://rmosolgo.github.io/graphql-ruby)
 docs for how to do this.
+
+### Types
+
+Field types and argument types are all supplied as a hash of key value 
+pairs. An exclamation mark at the end of the type marks it as required, 
+and wrapping the type in an array marks it as a list of that type.
+
+```ruby
+{
+    name: :string,
+    more_names: [:string],
+    required: :integer!,
+}
+```
+
+The supported types are:
+
+- integer
+- text
+- string
+- decimal
+- float
+- boolean
+
+Note, these are the same as active record's column types for consistency.
+
 
 ## Roadmap
 
