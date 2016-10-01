@@ -79,7 +79,7 @@ end
 Creating an endpoint for Graphite.
 
 ```ruby
-# initializer or app file
+# inside an initializer or other file inside the load path
 GraphSchema = Graphite::Schema.new.schema
 
 # controllers/graphql_controller.rb
