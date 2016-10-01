@@ -37,6 +37,13 @@ module Graphite
     end
 
     def graphql_type_of(type)
+
+      is_required = false
+      if type.to_s.end_with?('!')
+        is_required = true
+        type = type.to_s.chomp('!').to_sym
+      end
+
       is_list = false
       if type.is_a?(Array)
         is_list = true
@@ -60,11 +67,10 @@ module Graphite
           res = GraphQL::STRING_TYPE
       end
 
-      if is_list
-        res.to_list_type
-      else
-        res
-      end
+      res = res.to_list_type if is_list
+      res = !res if is_required
+
+      res
     end
 
     def graphql_type(column)

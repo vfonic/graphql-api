@@ -20,7 +20,12 @@ class Graphite::Test < ActiveSupport::TestCase
 
   def schema_query(query, opts={})
     res = schema.execute(query)
-    assert_nil res['errors'], res['errors']
+
+    if opts[:should_fail]
+      assert_not_nil res['errors'], res
+    else
+      assert_nil res['errors'], res['errors']
+    end
 
     if opts[:print]
       puts res
@@ -72,8 +77,12 @@ class Graphite::Test < ActiveSupport::TestCase
   end
 
   # Queries
-  test "query blog return" do
-    schema_query('query { blogQuery(content_matches: ["name"]) { id, name } }')
+  test "query blog failing input" do
+    schema_query('query { blogQuery(content_matches: ["name"]) { id, name } }', should_fail: true)
+  end
+
+  test "query blog" do
+    schema_query('query { blogQuery(reqs: "required") { id, name } }')
   end
 
 
