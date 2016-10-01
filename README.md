@@ -20,7 +20,7 @@ end
 
 Graphite will respond to the following queries for the blog resource:
 
-```graphql
+```
 query { blog(id: 1) { id, title, author { name } } }
 
 query { blogs(limit: 5) { id, title, author { name } } }
