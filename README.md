@@ -1,28 +1,79 @@
 # Graphite
-Short description and motivation.
+Graphite is a graphql framework for Rails that supports auto generating 
+queries based on Active Record models and plain Ruby objects. Don't 
+manually define Graphql structures, let Graphite handle it for you.
 
-## Usage
-How to use my plugin.
+## Example
 
-## Installation
-Add this line to your application's Gemfile:
+Given the following model structure:
 
 ```ruby
-gem 'graphite'
+class Author < ActiveRecord::Base
+  # columns: name
+end
+
+class Blog < ActiveRecord::Base
+  belongs_to :author
+  # columns: title, content
+end
 ```
 
-And then execute:
-```bash
-$ bundle
+Graphite will respond to the following queries for the blog resource:
+
+```graphql
+query { blog(id: 1) { id, title, author { name } } }
+
+query { blogs(limit: 5) { id, title, author { name } } }
+
+mutation createBlog { createBlog(input: {title: "test", author_id: 2}) { blog { id } } }
+
+mutation { updateBlog(input: {id: 1, title: "test"}) { blog { id } } }
+
+mutation { deleteBlog(input: {id: 1}) { blog_id } }
 ```
 
-Or install it yourself as:
-```bash
-$ gem install graphite
+Graphite also has support for command objects:
+```ruby
+# Graphql mutation derived from the below command object:
+# mutation { blogCreateCommand(input: {tags: ["test", "testing"], name: "hello"}) { blog { id, tags { name } } } }
+
+class BlogCreateCommand < Graphite::CommandType
+  inputs name: :string, tags: [:string]
+  returns :blog, Blog
+
+  def perform
+    # do something and return the ActiveRecord Blog model
+  end
+
+end
 ```
 
-## Contributing
-Contribution directions go here.
+... and query objects:
+```ruby
+# Graphql query derived from the below query object:
+# query { blogQuery(content_matches: ["name"]) { id, name } }
 
-## License
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+class BlogQuery < Graphite::QueryType
+  arguments name: :string, content_matches: [:string]
+  return_type [Blog]
+
+  def execute
+    Blog.all
+  end
+
+end
+```
+
+## Documentation
+
+### Model Objects
+
+#### Active Record
+
+#### Poro
+
+#### Authorization
+
+### Command Objects
+
+### Query Objects
