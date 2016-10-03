@@ -2,6 +2,14 @@ require 'graphql/api/command_type'
 require 'graphql/api/query_type'
 require 'graphql/api/helpers'
 require 'graphql/api/schema_error'
+require 'graphql/api/resolvers/model_create_mutation'
+require 'graphql/api/resolvers/model_delete_mutation'
+require 'graphql/api/resolvers/model_update_mutation'
+require 'graphql/api/resolvers/model_find_query'
+require 'graphql/api/resolvers/model_list_query'
+require 'graphql/api/resolvers/query_object_query'
+require 'graphql/api/resolvers/command_mutation'
+require 'graphql/api/resolvers/field'
 require 'graphql'
 
 include GraphQL::Api::Helpers
@@ -45,7 +53,7 @@ module GraphQL::Api
           model_class.columns.each do |column|
             field column.name do
               type graphql_type(column)
-              resolve -> (obj, args, ctx) { graphql_fetch(obj, ctx, column.name) }
+              resolve Resolvers::Field.new(column.name)
             end
           end
         end
@@ -64,7 +72,7 @@ module GraphQL::Api
               else
                 type object_types[association.class_name.constantize]
               end
-              resolve -> (obj, args, ctx) { graphql_fetch(obj, ctx, name) }
+              resolve Resolvers::Field.new(name)
             end
           end
         end
@@ -87,9 +95,7 @@ module GraphQL::Api
           return_field return_name, graphql_type_for_object(return_type, object_types)
         end
 
-        resolve -> (inputs, ctx) {
-          object_type.new(inputs, ctx).perform
-        }
+        resolve Resolvers::CommandMutation.new(object_type)
       end
     end
 
@@ -107,11 +113,7 @@ module GraphQL::Api
         end
 
         return_field model_class.name.underscore.to_sym, object_types[model_class]
-
-        resolve -> (inputs, ctx) {
-          item = model_class.create!(inputs.to_h)
-          {model_class.name.underscore.to_sym => item}
-        }
+        resolve Resolvers::ModelCreateMutation.new(model_class)
       end
     end
 
@@ -130,12 +132,7 @@ module GraphQL::Api
         end
 
         return_field model_class.name.underscore.to_sym, object_types[model_class]
-
-        resolve -> (inputs, ctx) {
-          item = model_class.find(inputs[:id])
-          item.update!(inputs.to_h)
-          {model_class.name.underscore.to_sym => item}
-        }
+        resolve Resolvers::ModelUpdateMutation.new(model_class)
       end
     end
 
@@ -149,11 +146,7 @@ module GraphQL::Api
         input_field :id, !types.ID
 
         return_field "#{model_class.name.underscore}_id".to_sym, types.ID
-
-        resolve -> (inputs, ctx) {
-          item = model_class.find(inputs[:id]).destroy!
-          {"#{model_class.name.underscore}_id".to_sym => item.id}
-        }
+        resolve Resolvers::ModelDeleteMutation.new(model_class)
       end
     end
 
@@ -179,13 +172,7 @@ module GraphQL::Api
                 end
               end
 
-              resolve -> (obj, args, ctx) {
-                if object_class.respond_to?(:graph_find)
-                  object_class.graph_find(args, ctx)
-                else
-                  object_class.find_by!(args.to_h)
-                end
-              }
+              resolve Resolvers::ModelFindQuery.new(object_class)
             end
 
             field(object_class.name.camelize(:lower).pluralize) do
@@ -198,23 +185,7 @@ module GraphQL::Api
                 end
               end
 
-              resolve -> (obj, args, ctx) {
-                if object_class.respond_to?(:graph_where)
-                  object_class.graph_where(args, ctx)
-                else
-                  eager_load = []
-                  ctx.irep_node.children.each do |child|
-                    eager_load << child[0] if object_class.reflections.find { |name, _| name == child[0] }
-                  end
-
-                  query_args = args.to_h
-                  query_args.delete('limit')
-
-                  q = object_class.where(query_args)
-                  q.eager_load(*eager_load) if eager_load.any?
-                  q.limit(args[:limit] || 30)
-                end
-              }
+              resolve Resolvers::ModelListQuery.new(object_class)
             end
 
           elsif object_class.respond_to?(:arguments) && object_class.respond_to?(:return_type)
@@ -226,9 +197,7 @@ module GraphQL::Api
                 argument argument_name, graphql_type_of(argument_type)
               end
 
-              resolve -> (obj, args, ctx) {
-                object_class.new(args, ctx).execute
-              }
+              resolve Resolvers::QueryObjectQuery.new(object_class)
             end
 
           end
