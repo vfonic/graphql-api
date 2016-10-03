@@ -183,7 +183,35 @@ They take a set of inputs as well as a graphql context and provide a
 `perform` method that returns a Graphql understandable type. These objects
 give you an object oriented abstraction for handling mutations.
 
-Command objects must implement the interface defined in `GraphQL::Api::CommandType`
+Command objects must implement the interface defined in `GraphQL::Api::CommandType`.
+
+To better model controllers, you can define the commands `actions` this
+will allow a command to respond to multiple methods on the same class. For
+example, the following code will model a restful controller using commands.
+The mutation will be prefixed with the action name. For example, the code
+below will create a `updateBlogCommand` mutation as well as a `deleteBlogCommand`.
+
+```ruby
+class BlogCommand < GraphQL::Api::CommandType
+  inputs name: :string, tags: [:string], id: :integer
+  returns blog: Blog
+  
+  # this tells GraphQL-Api to make two mutations that call the below methods.
+  actions :update, :delete
+
+  def update
+    blog = Blog.find(inputs[:id])
+    blog.update!(inputs.to_h)
+    {blog: blog}
+  end
+
+  def delete
+    blog = Blog.find(inputs[:id]).destroy!
+    {blog: blog}
+  end
+
+end
+```
 
 ### Query Objects
 

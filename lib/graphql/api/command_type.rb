@@ -17,6 +17,11 @@ module GraphQL::Api
       @returns || {}
     end
 
+    def self.actions(*actions)
+      @actions = actions if actions.any?
+      @actions || []
+    end
+
     def perform
     end
 

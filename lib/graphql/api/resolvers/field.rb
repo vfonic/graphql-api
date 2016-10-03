@@ -2,7 +2,8 @@ module GraphQL::Api
   module Resolvers
     class Field
 
-      def initialize(name)
+      def initialize(model, name)
+        @model = model
         @name = name
       end
 

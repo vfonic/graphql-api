@@ -76,6 +76,14 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
     schema_query('mutation { poroCommand(input: {name: "foobar"}) { poro { name } } }')
   end
 
+  test "mutation custom action command update" do
+    schema_query('mutation { updateBlogCommand(input: {name: "foobar", id: 1}) { blog { name } } }')
+  end
+
+  test "mutation custom action command delete" do
+    schema_query('mutation { deleteBlogCommand(input: {id: 3}) { blog { id } } }')
+  end
+
   # Queries
   test "query blog failing input" do
     schema_query('query { blogQuery(content_matches: ["name"]) { id, name } }', should_fail: true)

@@ -53,7 +53,7 @@ module GraphQL::Api
           model_class.columns.each do |column|
             field column.name do
               type graphql_type(column)
-              resolve Resolvers::Field.new(column.name)
+              resolve Resolvers::Field.new(model_class, column.name)
             end
           end
         end
@@ -72,7 +72,7 @@ module GraphQL::Api
               else
                 type object_types[association.class_name.constantize]
               end
-              resolve Resolvers::Field.new(name)
+              resolve Resolvers::Field.new(model_class, name)
             end
           end
         end
@@ -80,12 +80,12 @@ module GraphQL::Api
       end
     end
 
-    def create_command_type(object_type)
+    def create_command_type(object_type, action)
       object_types = @types
 
       GraphQL::Relay::Mutation.define do
         name object_type.name
-        description "Command #{object_type.name}"
+        description "Command #{object_type.name} #{action}"
 
         object_type.inputs.each do |input, type|
           input_field input, graphql_type_of(type)
@@ -95,7 +95,7 @@ module GraphQL::Api
           return_field return_name, graphql_type_for_object(return_type, object_types)
         end
 
-        resolve Resolvers::CommandMutation.new(object_type)
+        resolve Resolvers::CommandMutation.new(object_type, action)
       end
     end
 
@@ -153,7 +153,7 @@ module GraphQL::Api
     def query(&block)
       object_types = @types
 
-      @query ||= GraphQL::ObjectType.define do
+      GraphQL::ObjectType.define do
         name 'Query'
         description 'The query root for this schema'
 
@@ -209,7 +209,7 @@ module GraphQL::Api
     def mutation(&block)
       mutations = @mutations
 
-      @mutation ||= GraphQL::ObjectType.define do
+      GraphQL::ObjectType.define do
         name 'Mutation'
         instance_eval(&block) if block
 
@@ -243,9 +243,16 @@ module GraphQL::Api
       end
 
       all_commands.each do |command|
-        @mutations[command] = [
-            [command.name.camelize(:lower), create_command_type(command)]
-        ]
+        if command.respond_to?(:actions) && command.actions.any?
+          @mutations[command] = []
+          command.actions.each do |action|
+            @mutations[command] << ["#{action}#{command.name}", create_command_type(command, action)]
+          end
+        else
+          @mutations[command] = [
+              [command.name.camelize(:lower), create_command_type(command, :perform)]
+          ]
+        end
       end
     end
 
