@@ -64,7 +64,7 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
   end
 
   test "delete a blog" do
-    schema_query('mutation { deleteBlog(input: {id: 1}) { blog_id } }')
+    schema_query('mutation { deleteBlog(input: {id: 1}) { blog { id } } }')
   end
 
   # Commands

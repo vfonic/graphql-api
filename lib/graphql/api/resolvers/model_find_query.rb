@@ -4,14 +4,24 @@ module GraphQL::Api
 
       def initialize(model)
         @model = model
+        @policy_class = "#{model.name}Policy".safe_constantize
       end
 
       def call(obj, args, ctx)
         if @model.respond_to?(:graph_find)
-          @model.graph_find(args, ctx)
+          item = @model.graph_find(args, ctx)
         else
-          @model.find_by!(args.to_h)
+          item = @model.find_by!(args.to_h)
         end
+
+        if @policy_class
+          policy = @policy_class.new(ctx[:current_user], item, ctx)
+          unless policy.read?
+            return nil
+          end
+        end
+
+        item
       end
 
     end

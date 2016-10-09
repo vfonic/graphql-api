@@ -139,13 +139,15 @@ module GraphQL::Api
     def delete_mutation(model_class)
       return nil unless model_class < ActiveRecord::Base
 
+      object_types = @types
+
       GraphQL::Relay::Mutation.define do
         name "Delete#{model_class.name}"
         description "Delete #{model_class.name}"
 
         input_field :id, !types.ID
 
-        return_field "#{model_class.name.underscore}_id".to_sym, types.ID
+        return_field model_class.name.underscore.to_sym, object_types[model_class]
         resolve Resolvers::ModelDeleteMutation.new(model_class)
       end
     end

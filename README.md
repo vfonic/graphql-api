@@ -149,6 +149,17 @@ GraphQL-Api will load in all models, query objects and commands from the rails
 app directory automatically. If you store these in a different location
 you can pass them in directly to the new command.
 
+### Policy Objects
+
+Policy objects can be instantiated for accessing models. These objects
+should meet the following interface methods.
+
+##### CRUD Policies
+
+The policy object should return true or false methods for all of the crud
+options allowing the mutation to take place, ie
+
+
 ### Model Objects
 
 Model objects are the core return value from GraphQL-Api. They can be a plain

@@ -1,4 +1,5 @@
 require "graphql/api/version"
+require "graphql/api/policy"
 require "graphql/api/schema"
 
 module GraphQL
