@@ -130,9 +130,6 @@ end
 For more complicated access management, define query objects and Poro's
 with only a subset of fields that can be accessed.
 
-Future work is this area is ongoing. For example, a CanCan integration 
-could be a much simpler way of separating out this logic.
-
 ## Documentation
 
 ### Querying
@@ -312,7 +309,6 @@ Note, these are the same as active record's column types for consistency.
 ## Roadmap
 
 - [ ] Customizing resolvers
-- [ ] CanCan support
 - [ ] Relay support
 - [ ] Additional object support (enums, interfaces ...)
 - [ ] Support non rails frameworks
