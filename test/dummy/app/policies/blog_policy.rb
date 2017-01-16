@@ -16,4 +16,8 @@ class BlogPolicy < GraphQL::Api::Policy
     ctx[:test_key].nil?
   end
 
+  def access_name?
+    false
+  end
+
 end

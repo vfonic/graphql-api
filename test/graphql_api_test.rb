@@ -38,11 +38,6 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
     schema_query("query { blog(id: #{Blog.first.id}) { id, name } }")
   end
 
-  test "cannot read blog name" do
-    data = schema_query("query { blog(id: #{Blog.first.id}) { id, name } }")
-    assert_nil data['data']['blog']['name']
-  end
-
   test "read multiple blogs" do
     schema_query("query { blogs { id, name, author { name } } }")
   end
@@ -133,6 +128,11 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
     assert_raises(GraphQL::Api::UnauthorizedException) do
       schema_query('mutation { deleteBlog(input: {id: 1}) { blog { id } } }', context: { test_key: 1 })
     end
+  end
+
+  test "cannot read blog name" do
+    data = schema_query("query { blog(id: #{Blog.first.id}) { id, name } }")
+    assert_nil data['data']['blog']['name']
   end
 
 end

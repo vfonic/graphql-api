@@ -33,5 +33,9 @@ module GraphQL::Api
       raise UnauthorizedException.new
     end
 
+    def unauthorized_field_access(name)
+      nil
+    end
+
   end
 end

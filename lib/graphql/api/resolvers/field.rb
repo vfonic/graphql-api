@@ -14,11 +14,10 @@ module GraphQL::Api
           return policy.unauthorized! unless policy.read?
 
           if policy.respond_to?("access_#{@name}?")
-            obj.send(@name) if policy.send("access_#{@name}?")
-          else
-            obj.send(@name)
+            return policy.unauthorized_field_access(@name) unless policy.send("access_#{@name}?")
           end
-          obj.send(@name) if policy.respond_to?("access_#{@name}?")
+          
+          obj.send(@name)
         elsif obj.respond_to?("access_#{@name}?")
           obj.send(@name) if obj.send("access_#{@name}?", ctx)
         else
