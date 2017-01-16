@@ -19,7 +19,7 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
   end
 
   def schema_query(query, opts={})
-    res = schema.execute(query)
+    res = schema.execute(query, context: opts[:context])
 
     if opts[:should_fail]
       assert_not_nil res['errors'], res
@@ -36,11 +36,6 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
   # Models
   test "read blog" do
     schema_query("query { blog(id: #{Blog.first.id}) { id, name } }")
-  end
-
-  test "cannot read blog name" do
-    data = schema_query("query { blog(id: #{Blog.first.id}) { id, name } }")
-    assert_nil data['data']['blog']['name']
   end
 
   test "read multiple blogs" do
@@ -108,6 +103,36 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
 
     schema = GraphQL::Schema.define(query: graphite.query, mutation: mutation)
     schema.execute('mutation { simpleMutation(input: {name: "hello"}) { item } }')
+  end
+
+  # policy objects
+  test "policy object read failing" do
+    assert_raises(GraphQL::Api::UnauthorizedException) do
+      schema_query("query { blogs { id, name, tags { name } } }", context: { test_key: 1 })
+    end
+  end
+
+  test "policy object create failing" do
+    assert_raises(GraphQL::Api::UnauthorizedException) do
+      schema_query('mutation { createBlog(input: {name: "test", author_id: 2}) { blog { id } } }', context: { test_key: 1 })
+    end
+  end
+
+  test "policy object update failing" do
+    assert_raises(GraphQL::Api::UnauthorizedException) do
+      schema_query('mutation { updateBlog(input: {id: 1, name: "test"}) { blog { id } } }', context: { test_key: 1 })
+    end
+  end
+
+  test "policy object delete failing" do
+    assert_raises(GraphQL::Api::UnauthorizedException) do
+      schema_query('mutation { deleteBlog(input: {id: 1}) { blog { id } } }', context: { test_key: 1 })
+    end
+  end
+
+  test "cannot read blog name" do
+    data = schema_query("query { blog(id: #{Blog.first.id}) { id, name } }")
+    assert_nil data['data']['blog']['name']
   end
 
 end

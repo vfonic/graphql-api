@@ -8,7 +8,7 @@ class GraphqlController < ApplicationController
     render json: GraphSchema.execute(
         params[:query],
         variables: params[:variables] || {},
-        context: {current_user: current_user}
+        context: {current_user: current_user, test_key: params[:test_key]}
     )
   end
 

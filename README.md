@@ -1,6 +1,6 @@
 # GraphQL-Api
-GraphQL-Api is an opinionated Graphql framework for Rails that supports 
-auto generating queries based on Active Record models and plain Ruby 
+GraphQL-Api is an opinionated Graphql framework for Rails that supports
+auto generating queries based on Active Record models and plain Ruby
 objects.
 
 ## Example
@@ -93,37 +93,37 @@ class GraphqlController < ApplicationController
   # will respond to graphql requests and pass through the current user
   def create
     render json: GraphSchema.execute(
-        params[:query], 
-        variables: params[:variables] || {}, 
+        params[:query],
+        variables: params[:variables] || {},
         context: {current_user: current_user}
     )
   end
-  
+
 end
 ```
 
 ### Authorization
 
-GraphQL-Api will check for an `access_<field>?(ctx)` method on all model 
-objects before returning the  value. If this method returns false, the 
+GraphQL-Api will check for an `access_<field>?(ctx)` method on all model
+objects before returning the  value. If this method returns false, the
 value will be `nil`.
 
-To scope queries for the model, define the `graph_find(args, ctx)` and 
+To scope queries for the model, define the `graph_find(args, ctx)` and
 `graph_where(args, ctx)` methods using the `ctx` parameter to get the
 current user and apply a scoped query. For example:
 
 ```ruby
 class Blog < ActiveRecord::Base
   belongs_to :author
-  
+
   def self.graph_find(args, ctx)
     ctx[:current_user].blogs.find(args[:id])
   end
-  
+
   def access_content?(ctx)
     ctx[:current_user].is_admin?
   end
-  
+
 end
 ```
 
@@ -156,7 +156,7 @@ The policy object is defined as follows, with the naming convention following
 the pattern `{Model}Policy`.
 ```ruby
 class UserPolicy < GraphQL::Api::Policy
-  
+
   def read?
     # model is the instance, user is the current_user
     user.role == 'admin' || user.id == model.id
@@ -164,7 +164,7 @@ class UserPolicy < GraphQL::Api::Policy
 
 end
 ```
-There are four key methods that represent the CRUD operations: 
+There are four key methods that represent the CRUD operations:
 - `read?`
 - `create?`
 - `update?`
@@ -178,7 +178,9 @@ following form:
     access_{field}?
 
 If this method exists, the policy will be consulted before reading the
-field. If it returns false, it will raise an unauthorized exception.
+field. You can control the response behaviour by overriding the
+`unauthorized_field_access(field_name)` method on the policy object.
+By default it will return nil.
 
 ### Model Objects
 
@@ -195,7 +197,7 @@ relationship is set up. Column types are also inferred.
 
 GraphQL-Api will set up two queries on the main Graphql query object. One for
 a single record and another for a collection. You can override these queries
-by setting a `graph_find(args, ctx)` and `graph_where(args, ctx)` class 
+by setting a `graph_find(args, ctx)` and `graph_where(args, ctx)` class
 methods on your model. The `ctx` parameter will contain the context passed
 in from the controller while the `args` parameter will contain the arguments
 passed into the graphql query.
@@ -203,7 +205,7 @@ passed into the graphql query.
 #### Poro
 
 Plain old ruby objects are supported by implementing a class method called
-`fields` on the object that returns the expected [types](#types) hash. 
+`fields` on the object that returns the expected [types](#types) hash.
 Methods on the Poro should be defined with the same name as the provided
 fields.
 
@@ -226,7 +228,7 @@ below will create a `updateBlogCommand` mutation as well as a `deleteBlogCommand
 class BlogCommand < GraphQL::Api::CommandType
   inputs name: :string, tags: [:string], id: :integer
   returns blog: Blog
-  
+
   # this tells GraphQL-Api to make two mutations that call the below methods.
   actions :update, :delete
 
@@ -282,8 +284,8 @@ docs for how to do this.
 
 ### Types
 
-Field types and argument types are all supplied as a hash of key value 
-pairs. An exclamation mark at the end of the type marks it as required, 
+Field types and argument types are all supplied as a hash of key value
+pairs. An exclamation mark at the end of the type marks it as required,
 and wrapping the type in an array marks it as a list of that type.
 
 ```ruby

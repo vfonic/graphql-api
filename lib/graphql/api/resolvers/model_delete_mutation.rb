@@ -11,10 +11,8 @@ module GraphQL::Api
         item = @model.find(inputs[:id])
 
         if @policy_class
-          policy = @policy_class.new(ctx[:current_user], item, ctx)
-          unless policy.destroy?
-            return {key => nil}
-          end
+          policy = @policy_class.new(ctx, item)
+          return policy.unauthorized! unless policy.destroy?
         end
 
         item.destroy!
