@@ -4,4 +4,16 @@ class BlogPolicy < GraphQL::Api::Policy
     ctx[:test_key].nil?
   end
 
+  def destroy?
+    ctx[:test_key].nil?
+  end
+
+  def create?
+    ctx[:test_key].nil?
+  end
+
+  def update?
+    ctx[:test_key].nil?
+  end
+
 end
