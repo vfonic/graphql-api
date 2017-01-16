@@ -130,9 +130,6 @@ end
 For more complicated access management, define query objects and Poro's
 with only a subset of fields that can be accessed.
 
-Future work is this area is ongoing. For example, a CanCan integration 
-could be a much simpler way of separating out this logic.
-
 ## Documentation
 
 ### Querying
@@ -151,14 +148,37 @@ you can pass them in directly to the new command.
 
 ### Policy Objects
 
-Policy objects can be instantiated for accessing models. These objects
-should meet the following interface methods.
+Policy objects can be created for controlling access to fields of a model.
+This enables you to provide a DRY solution for controlling access to granular
+attributes of models and PORO's.
 
-##### CRUD Policies
+The policy object is defined as follows, with the naming convention following
+the pattern `{Model}Policy`.
+```ruby
+class UserPolicy < GraphQL::Api::Policy
+  
+  def read?
+    # model is the instance, user is the current_user
+    user.role == 'admin' || user.id == model.id
+  end
 
-The policy object should return true or false methods for all of the crud
-options allowing the mutation to take place, ie
+end
+```
+There are four key methods that represent the CRUD operations: 
+- `read?`
+- `create?`
+- `update?`
+- `destroy?`
 
+These are checked by the default resolvers created by GraphQL-Api
+before the mutations or queries take place. Additionally, for control
+over access to fields, you may define a method on the policy with the
+following form:
+
+    access_{field}?
+
+If this method exists, the policy will be consulted before reading the
+field. If it returns false, it will raise an unauthorized exception.
 
 ### Model Objects
 
@@ -289,7 +309,6 @@ Note, these are the same as active record's column types for consistency.
 ## Roadmap
 
 - [ ] Customizing resolvers
-- [ ] CanCan support
 - [ ] Relay support
 - [ ] Additional object support (enums, interfaces ...)
 - [ ] Support non rails frameworks
