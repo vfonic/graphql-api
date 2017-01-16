@@ -19,7 +19,7 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
   end
 
   def schema_query(query, opts={})
-    res = schema.execute(query)
+    res = schema.execute(query, context: opts[:context])
 
     if opts[:should_fail]
       assert_not_nil res['errors'], res
@@ -111,8 +111,10 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
   end
 
   # policy objects
-  test "policy object use" do
-    
+  test "policy object failing" do
+    assert_raises(GraphQL::Api::UnauthorizedException) do
+      schema_query("query { blogs { id, name, tags { name } } }", context: { test_key: 1 })      
+    end
   end
 
 end

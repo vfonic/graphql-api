@@ -1,7 +1,7 @@
 class BlogPolicy < GraphQL::Api::Policy
 
   def read?
-    false
+    ctx[:test_key].nil?
   end
 
 end
