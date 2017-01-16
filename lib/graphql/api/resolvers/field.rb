@@ -10,8 +10,8 @@ module GraphQL::Api
 
       def call(obj, args, ctx)
         if @policy_class
-          policy = @policy_class.new(ctx[:current_user], obj, ctx)
-          return nil unless policy.read?
+          policy = @policy_class.new(ctx, obj)
+          return policy.unauthorized! unless policy.read?
 
           if policy.respond_to?("access_#{@name}?")
             obj.send(@name) if policy.send("access_#{@name}?")

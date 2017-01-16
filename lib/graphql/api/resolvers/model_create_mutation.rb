@@ -9,10 +9,8 @@ module GraphQL::Api
 
       def call(inputs, ctx)
         if @policy_class
-          policy = @policy_class.new(ctx[:current_user], nil, ctx)
-          unless policy.create?
-            return {key => nil}
-          end
+          policy = @policy_class.new(ctx, nil)
+          return policy.unauthorized! unless policy.create?
         end
 
         item = @model.create!(inputs.to_h)

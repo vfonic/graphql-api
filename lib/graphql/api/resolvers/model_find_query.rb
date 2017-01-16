@@ -15,10 +15,8 @@ module GraphQL::Api
         end
 
         if @policy_class
-          policy = @policy_class.new(ctx[:current_user], item, ctx)
-          unless policy.read?
-            return nil
-          end
+          policy = @policy_class.new(ctx, item)
+          return policy.unauthorized! unless policy.read?
         end
 
         item

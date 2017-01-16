@@ -110,4 +110,9 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
     schema.execute('mutation { simpleMutation(input: {name: "hello"}) { item } }')
   end
 
+  # policy objects
+  test "policy object use" do
+    
+  end
+
 end
