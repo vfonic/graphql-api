@@ -119,7 +119,19 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
 
   test "policy object create failing" do
     assert_raises(GraphQL::Api::UnauthorizedException) do
-      schema_query("mutation { createBlog(input: {name: "test", author_id: 2}) { blog { id } } }", context: { test_key: 1 })
+      schema_query('mutation { createBlog(input: {name: "test", author_id: 2}) { blog { id } } }', context: { test_key: 1 })
+    end
+  end
+
+  test "policy object update failing" do
+    assert_raises(GraphQL::Api::UnauthorizedException) do
+      schema_query('mutation { updateBlog(input: {id: 1, name: "test"}) { blog { id } } }', context: { test_key: 1 })
+    end
+  end
+
+  test "policy object delete failing" do
+    assert_raises(GraphQL::Api::UnauthorizedException) do
+      schema_query('mutation { deleteBlog(input: {id: 1}) { blog { id } } }', context: { test_key: 1 })
     end
   end
 
