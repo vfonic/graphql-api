@@ -1,7 +1,7 @@
 class BlogPolicy < GraphQL::Api::Policy
 
   def read?
-    true
+    false
   end
 
 end
