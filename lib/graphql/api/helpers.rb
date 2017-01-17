@@ -1,7 +1,6 @@
-require 'graphql/api/schema_error'
-
 module GraphQL::Api
   module Helpers
+
     def all_constants(root)
       begin
         Dir["#{Rails.root}/app/#{root}/*"].map do |f|
@@ -18,7 +17,7 @@ module GraphQL::Api
 
     def graphql_type_for_object(return_type, object_types)
       if return_type.nil?
-        raise SchemaError.new("return type is nil for object")
+        raise("Return type is nil for object")
       end
 
       if return_type.respond_to?(:to_sym) || (return_type.is_a?(Array) && return_type[0].respond_to?(:to_sym))
@@ -30,7 +29,7 @@ module GraphQL::Api
       end
 
       if type.nil?
-        raise SchemaError.new("could not parse return type for: #{return_type}")
+        raise("Could not parse return type for: #{return_type}")
       end
 
       type

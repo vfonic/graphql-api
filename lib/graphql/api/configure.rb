@@ -3,76 +3,35 @@ require "graphql/api/helpers"
 require "graphql/api/resolvers/model_find_query"
 require "graphql/api/resolvers/model_list_query"
 require "graphql/api/resolvers/query_object_query"
+require "graphql/api/mutation_description"
+require "graphql/api/query_description"
+
+include GraphQL::Api::Helpers
 
 module GraphQL::Api
-  # Allows the following DSL:
-  #
-  # GraphQL::Api.configure do
-  #   model User, only: [:create, :update, :delete, :show, :index]
-  #   command
-  #   query
-  # end
-
-  class ApiQueryType
-    attr_accessor :name, :type, :args, :resolver
-
-    def initialize(name, type, args, resolver)
-      @name = name
-      @type = type
-      @args = args
-      @resolver = resolver
-    end
-
-    def mutation_type?
-      false
-    end
-
-    def query_type?
-      true
-    end
-
-    def to_s
-      "#<Query #{name} type=#{type.name}>"
-    end
-
-  end
-
-  class ApiMutationType
-    attr_accessor :name, :type
-
-    def initialize(type)
-      @type = type
-    end
-
-    def mutation_type?
-      true
-    end
-
-    def query_type?
-      false
-    end
-
-    def name
-      @type.name.camelize(:lower)
-    end
-
-    def to_s
-      "#<Mutation #{name} type=#{type.name}>"
-    end
-
-  end
-
   class Configure
     include Types
-    include Helpers
 
     def initialize
       @types = {} # maps simple types to graphql query types, not needed for mutations
       @graphql_objects = []
     end
 
+    # Return the graphQL schema
     def schema
       @schema ||= GraphQL::Schema.define(query: graphql_query, mutation: graphql_mutation)
+    end
+
+    def with_defaults(commands: [], queries: [], models: [])
+      (all_constants('queries') + queries).each do |query_class|
+        query(query_class)
+      end
+      (all_constants('models') + models).each do |model_class|
+        model(model_class)
+      end
+      (all_constants('commands') + commands).each do |command_class|
+        command(command_class)
+      end
     end
 
     def model(model, only: nil)
@@ -95,7 +54,7 @@ module GraphQL::Api
 
     def command(model, action = :perform)
       mutation = command_mutation_type(model, action)
-      @graphql_objects << ApiMutationType.new(mutation)
+      @graphql_objects << MutationDescription.new(mutation)
     end
 
     def query(model)
@@ -103,7 +62,7 @@ module GraphQL::Api
       name = model.name.camelize(:lower)
       type = graphql_type_for_object(model.return_type, @types)
 
-      @graphql_objects << ApiQueryType.new(name, type, args, Resolvers::QueryObjectQuery.new(model))
+      @graphql_objects << QueryDescription.new(name, type, args, Resolvers::QueryObjectQuery.new(model))
     end
 
     def with_model(model)
@@ -121,7 +80,7 @@ module GraphQL::Api
       args[:id] = :id
       name = model.name.camelize(:lower)
 
-      @graphql_objects << ApiQueryType.new(name, type, args, Resolvers::ModelFindQuery.new(model))
+      @graphql_objects << QueryDescription.new(name, type, args, Resolvers::ModelFindQuery.new(model))
     end
 
     def model_index(model, args = {})
@@ -130,22 +89,22 @@ module GraphQL::Api
       name = model.name.camelize(:lower).pluralize
       args[:limit] = :integer
 
-      @graphql_objects << ApiQueryType.new(name, type, args, Resolvers::ModelListQuery.new(model))
+      @graphql_objects << QueryDescription.new(name, type, args, Resolvers::ModelListQuery.new(model))
     end
 
     def model_create(model)
       mutation = model_mutation_create_type(model)
-      @graphql_objects << ApiMutationType.new(mutation)
+      @graphql_objects << MutationDescription.new(mutation)
     end
 
     def model_update(model)
       mutation = model_mutation_update_type(model)
-      @graphql_objects << ApiMutationType.new(mutation)
+      @graphql_objects << MutationDescription.new(mutation)
     end
 
     def model_delete(model)
       mutation = model_mutation_delete_type(model)
-      @graphql_objects << ApiMutationType.new(mutation)
+      @graphql_objects << MutationDescription.new(mutation)
     end
 
     def graphql_query(&block)
