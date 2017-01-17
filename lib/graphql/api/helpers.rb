@@ -51,6 +51,8 @@ module GraphQL::Api
       end
 
       case type
+        when :id
+          res = GraphQL::ID_TYPE
         when :integer
           res = GraphQL::INT_TYPE
         when :text
@@ -84,5 +86,6 @@ module GraphQL::Api
         obj.send(name)
       end
     end
+
   end
 end

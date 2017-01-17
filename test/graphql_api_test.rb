@@ -3,7 +3,21 @@ require 'test_helper'
 class GraphQL::Api::Test < ActiveSupport::TestCase
 
   def schema
-    GraphQL::Api::Schema.new.schema
+    # GraphQL::Api::Schema.new.schema
+    GraphQL::Api.configure do
+      model Author
+      model BlogTag
+      model Tag
+      model Blog
+      model Poro
+
+      command BlogCommand, :update
+      command BlogCommand, :delete
+      command BlogCreateCommand
+      command PoroCommand
+
+      query BlogQuery
+    end
   end
 
   setup do
@@ -33,13 +47,24 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
     res
   end
 
+  test 'config' do
+    res = GraphQL::Api.configure do
+      all_model Author
+      all_model BlogTag
+      all_model Tag
+      all_model Blog
+    end
+
+    puts res
+  end
+
   # Models
   test "read blog" do
     schema_query("query { blog(id: #{Blog.first.id}) { id, name } }")
   end
 
   test "read multiple blogs" do
-    schema_query("query { blogs { id, name, author { name } } }")
+    schema_query("query { blogs { id, name } }")
   end
 
   test "read multiple blogs limit" do
