@@ -3,6 +3,12 @@ GraphQL-Api is an opinionated Graphql framework for Rails that supports
 auto generating queries based on Active Record models and plain Ruby
 objects.
 
+## Status
+
+This project is an active work in progress. The API is currently being refined 
+and subject to change. Contributions are more than welcome! Once the project hits
+a 1.0 release the API should be considered stable.
+
 ## Example
 
 Given the following model structure:
