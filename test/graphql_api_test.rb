@@ -51,7 +51,8 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
   end
 
   test "create a blog" do
-    schema_query('mutation { createBlog(input: {name: "test", content: "hello", author_id: 2}) { blog { id, name, content } } }', print: true)
+    res = schema_query('mutation { createBlog(input: {name: "test", content: "hello", author_id: 2}) { blog { id, name, content } } }')
+    assert_not_nil res['data']['createBlog']['blog']['content']
   end
 
   test "update a blog" do
