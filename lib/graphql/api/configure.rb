@@ -34,15 +34,15 @@ module GraphQL::Api
       end
     end
 
-    def model(model, only: nil)
+    def model(model, only: nil, args: {})
       if model < ActiveRecord::Base
         if only
           only.each do |method|
             send("model_#{method}", model)
           end
         else
-          model_show(model)
-          model_index(model)
+          model_show(model, args: args)
+          model_index(model, args: args)
           model_create(model)
           model_delete(model)
           model_update(model)
@@ -50,6 +50,20 @@ module GraphQL::Api
       else
         with_model(model)
       end
+    end
+
+    def mutation_description(mutation_description)
+      unless mutation_description.mutation_type?
+        raise("Mutation must be called with a MutationDescription")
+      end
+      @graphql_objects << mutation_description
+    end
+
+    def query_description(query_description)
+      unless query_description.query_type?
+        raise("Mutation must be called with a MutationDescription")
+      end
+      @graphql_objects << query_description
     end
 
     def command(model, action = :perform)
@@ -61,7 +75,6 @@ module GraphQL::Api
       args = model.try(:arguments)
       name = model.name.camelize(:lower)
       type = graphql_type_for_object(model.return_type, @types)
-
       @graphql_objects << QueryDescription.new(name, type, args, Resolvers::QueryObjectQuery.new(model))
     end
 
@@ -76,19 +89,15 @@ module GraphQL::Api
 
     def model_show(model, args = {})
       type = with_model(model)
-
-      args[:id] = :id
       name = model.name.camelize(:lower)
-
+      args[:id] = :id
       @graphql_objects << QueryDescription.new(name, type, args, Resolvers::ModelFindQuery.new(model))
     end
 
     def model_index(model, args = {})
       type = with_model(model).to_list_type
-
       name = model.name.camelize(:lower).pluralize
       args[:limit] = :integer
-
       @graphql_objects << QueryDescription.new(name, type, args, Resolvers::ModelListQuery.new(model))
     end
 
