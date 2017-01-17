@@ -51,7 +51,7 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
   end
 
   test "create a blog" do
-    schema_query('mutation { createBlog(input: {name: "test", author_id: 2}) { blog { id } } }')
+    schema_query('mutation { createBlog(input: {name: "test", content: "hello", author_id: 2}) { blog { id, name, content } } }', print: true)
   end
 
   test "update a blog" do
@@ -93,7 +93,7 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
     simple_mutation = GraphQL::Relay::Mutation.define do
       input_field :name, !types.String
       return_field :item, types.String
-      resolve -> (inputs, ctx) {  {item: 'hello'}  }
+      resolve -> (obj, args, ctx) {  {item: 'hello'}  }
     end
 
     graphite = GraphQL::Api.graph

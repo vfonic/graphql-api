@@ -7,8 +7,8 @@ module GraphQL::Api
         @action = action
       end
 
-      def call(inputs, ctx)
-        @command.new(inputs, ctx).send(@action)
+      def call(obj, args, ctx)
+        @command.new(args, ctx).send(@action)
       end
 
     end

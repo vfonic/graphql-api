@@ -82,9 +82,10 @@ module GraphQL::Api
 
     def create_command_type(object_type, action)
       object_types = @types
+      prefix = action == :perform ? '' : action.capitalize
 
       GraphQL::Relay::Mutation.define do
-        name object_type.name
+        name "#{prefix}#{object_type.name}"
         description "Command #{object_type.name} #{action}"
 
         object_type.inputs.each do |input, type|
