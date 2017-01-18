@@ -12,11 +12,12 @@ module GraphQL::Api
       ctx[:current_user]
     end
 
-    # def execute?(command, action)
-    # end
-    #
-    # def query?(query, params)
-    # end
+    def perform?(cmd, action, params)
+      true
+    end
+
+    def execute?(query, params)
+    end
 
     def create?(instance, params)
       true
