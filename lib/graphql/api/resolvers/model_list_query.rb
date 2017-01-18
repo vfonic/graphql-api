@@ -1,10 +1,12 @@
+require "graphql/api/resolvers/helpers"
+
 module GraphQL::Api
   module Resolvers
     class ModelListQuery
+      include Helpers
 
       def initialize(model)
         @model = model
-        @policy_class = "#{model.name}Policy".safe_constantize
       end
 
       def call(obj, args, ctx)
@@ -18,8 +20,9 @@ module GraphQL::Api
         results = @model.where(query_args)
         results = results.eager_load(*eager_load) if eager_load.any?
 
-        if @policy_class
-          policy = @policy_class.new(ctx)
+        policy = get_policy(ctx)
+        if policy
+          # todo: is there a more efficient way of handling this? or should you be able to skip it?
           results.each do |instance|
             return policy.unauthorized! unless policy.read?(instance, query_args)
           end

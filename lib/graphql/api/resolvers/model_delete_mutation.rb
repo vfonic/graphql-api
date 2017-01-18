@@ -1,27 +1,25 @@
+require "graphql/api/resolvers/helpers"
+
 module GraphQL::Api
   module Resolvers
     class ModelDeleteMutation
+      include Helpers
 
       def initialize(model)
         @model = model
-        @policy_class = "#{model.name}Policy".safe_constantize
       end
 
       def call(obj, args, ctx)
         instance = @model.find(args[:id])
         params = args.to_h
 
-        if @policy_class
-          policy = @policy_class.new(ctx)
+        policy = get_policy(ctx)
+        if policy
           return policy.unauthorized! unless policy.destroy?(instance, params)
         end
 
         instance.destroy!
         {key => instance}
-      end
-
-      def key
-        @model.name.underscore.to_sym
       end
 
     end

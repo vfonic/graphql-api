@@ -1,26 +1,22 @@
+require "graphql/api/resolvers/helpers"
+
 module GraphQL::Api
   module Resolvers
     class Field
+      include Helpers
 
       def initialize(model, name)
         @model = model
         @name = name
-        @policy_class = "#{model.name}Policy".safe_constantize
       end
 
       def call(obj, args, ctx)
         params = args.to_h
 
-        if @policy_class
-          policy = @policy_class.new(ctx)
-
-          unless policy.read?(obj, params)
-            return policy.unauthorized!
-          end
-
-          unless policy.access_field?(obj, @name)
-            return policy.unauthorized_field_access(@name)
-          end
+        policy = get_policy(ctx)
+        if policy
+          return policy.unauthorized! unless policy.read?(obj, params)
+          return policy.unauthorized_field_access(@name) unless policy.access_field?(obj, @name)
         end
 
         obj.send(@name)
