@@ -8,15 +8,16 @@ module GraphQL::Api
       end
 
       def call(obj, args, ctx)
-        item = @model.find(args[:id])
+        instance = @model.find(args[:id])
+        params = args.to_h
 
         if @policy_class
-          policy = @policy_class.new(ctx, item)
-          return policy.unauthorized! unless policy.destroy?
+          policy = @policy_class.new(ctx)
+          return policy.unauthorized! unless policy.destroy?(instance, params)
         end
 
-        item.destroy!
-        {key => item}
+        instance.destroy!
+        {key => instance}
       end
 
       def key

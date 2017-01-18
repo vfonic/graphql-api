@@ -7,7 +7,8 @@ module GraphQL::Api
       end
 
       def call(obj, args, ctx)
-        @query_object.new(args, ctx).execute
+        params = args.to_h
+        @query_object.new(params, ctx).execute
       end
 
     end

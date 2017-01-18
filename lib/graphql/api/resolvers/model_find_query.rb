@@ -8,18 +8,15 @@ module GraphQL::Api
       end
 
       def call(obj, args, ctx)
-        if @model.respond_to?(:graph_find)
-          item = @model.graph_find(args, ctx)
-        else
-          item = @model.find_by!(args.to_h)
-        end
+        params = args.to_h
+        instance = @model.find_by!(params)
 
         if @policy_class
-          policy = @policy_class.new(ctx, item)
-          return policy.unauthorized! unless policy.read?
+          policy = @policy_class.new(ctx)
+          return policy.unauthorized! unless policy.read?(instance, params)
         end
 
-        item
+        instance
       end
 
     end

@@ -2,10 +2,9 @@ require "graphql/api/unauthorized_exception"
 
 module GraphQL::Api
   class Policy
-    attr_reader :ctx, :model
+    attr_reader :ctx
 
-    def initialize(ctx, model)
-      @model = model
+    def initialize(ctx)
       @ctx = ctx
     end
 
@@ -13,19 +12,26 @@ module GraphQL::Api
       ctx[:current_user]
     end
 
-    def create?
+    def allowed_params(action)
+    end
+
+    def create?(model, params)
       true
     end
 
-    def update?
+    def update?(model, params)
       true
     end
 
-    def destroy?
+    def destroy?(model, params)
       true
     end
 
-    def read?
+    def read?(model, params)
+      true
+    end
+
+    def access_field?(model, field)
       true
     end
 
@@ -33,7 +39,7 @@ module GraphQL::Api
       raise UnauthorizedException.new
     end
 
-    def unauthorized_field_access(name)
+    def unauthorized_field_access(field_name)
       nil
     end
 
