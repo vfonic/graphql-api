@@ -66,8 +66,8 @@ module GraphQL::Api
       @graphql_objects << query_description
     end
 
-    def command(model, action = :perform)
-      mutation = command_mutation_type(model, action)
+    def command(model, action: :perform, resolver: nil)
+      mutation = command_mutation_type(model, action, resolver: resolver)
       @graphql_objects << MutationDescription.new(mutation)
     end
 
@@ -78,17 +78,17 @@ module GraphQL::Api
       @graphql_objects << QueryDescription.new(name, type, args, Resolvers::QueryObjectQuery.new(model))
     end
 
-    def with_model(model)
+    def with_model(model, fields: {})
       query = @types[model]
       unless query
-        query = model_query_type(model)
+        query = model_query_type(model, fields: fields)
         @types[model] = query
       end
       query
     end
 
-    def model_show(model, args = {})
-      type = with_model(model)
+    def model_show(model, args: {}, fields: {})
+      type = with_model(model, fields: fields)
       name = model.name.camelize(:lower)
       args[:id] = :id
       @graphql_objects << QueryDescription.new(name, type, args, Resolvers::ModelFindQuery.new(model))
@@ -100,18 +100,18 @@ module GraphQL::Api
       @graphql_objects << QueryDescription.new(name, type, args, Resolvers::ModelListQuery.new(model))
     end
 
-    def model_create(model)
-      mutation = model_mutation_create_type(model)
+    def model_create(model, resolver: nil)
+      mutation = model_mutation_create_type(model, resolver: resolver)
       @graphql_objects << MutationDescription.new(mutation)
     end
 
-    def model_update(model)
-      mutation = model_mutation_update_type(model)
+    def model_update(model, resolver: nil)
+      mutation = model_mutation_update_type(model, resolver: resolver)
       @graphql_objects << MutationDescription.new(mutation)
     end
 
-    def model_delete(model)
-      mutation = model_mutation_delete_type(model)
+    def model_delete(model, resolver: nil)
+      mutation = model_mutation_delete_type(model, resolver: resolver)
       @graphql_objects << MutationDescription.new(mutation)
     end
 

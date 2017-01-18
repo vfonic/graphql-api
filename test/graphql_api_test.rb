@@ -75,19 +75,19 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
 
 
   test "custom mutation" do
-    # simple_mutation = GraphQL::Relay::Mutation.define do
-    #   input_field :name, !types.String
-    #   return_field :item, types.String
-    #   resolve -> (obj, args, ctx) {  {item: 'hello'}  }
-    # end
-    #
-    # graphite = GraphQL::Api.graph
-    # mutation = graphite.mutation do
-    #   field 'simpleMutation', simple_mutation.field
-    # end
-    #
-    # schema = GraphQL::Schema.define(query: graphite.query, mutation: mutation)
-    # schema.execute('mutation { simpleMutation(input: {name: "hello"}) { item } }')
+    simple_mutation = GraphQL::Relay::Mutation.define do
+      input_field :name, !types.String
+      return_field :item, types.String
+      resolve -> (obj, args, ctx) {  {item: 'hello'}  }
+    end
+
+    config = GraphQL::Api::Configure.new
+    mutation = config.graphql_mutation do
+      field 'simpleMutation', simple_mutation.field
+    end
+
+    schema = GraphQL::Schema.define(query: config.graphql_query, mutation: mutation)
+    schema.execute('mutation { simpleMutation(input: {name: "hello"}) { item } }')
   end
 
   # policy objects

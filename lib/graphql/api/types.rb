@@ -11,7 +11,7 @@ module GraphQL::Api
     include Helpers
 
     # Create the query type for the given model class.
-    def model_query_type(model_class)
+    def model_query_type(model_class, fields: {})
       object_types = @types
 
       GraphQL::ObjectType.define do
@@ -31,6 +31,10 @@ module GraphQL::Api
           model_class.fields.each do |field_name, field_type|
             field field_name, graphql_type_of(field_type)
           end
+        end
+
+        fields.each do |field_name, field_type|
+          field field_name, graphql_type_of(field_type)
         end
 
         if model_class.respond_to?(:reflections)
@@ -55,10 +59,11 @@ module GraphQL::Api
     end
 
     # Create the create mutation type for the given model class.
-    def model_mutation_create_type(model_class)
+    def model_mutation_create_type(model_class, fields: {}, resolver: nil)
       return nil unless model_class < ActiveRecord::Base
 
       object_types = @types
+      resolver = resolver || Resolvers::ModelCreateMutation.new(model_class)
 
       GraphQL::Relay::Mutation.define do
         name "Create#{model_class.name}"
@@ -74,25 +79,31 @@ module GraphQL::Api
           end
         end
 
+        fields.each do |field_name, field_type|
+          input_field field_name, graphql_type_of(field_type)
+        end
+
         unless object_types[model_class]
           raise("Return type not found: #{model_class.name}")
         end
 
         return_field model_class.name.underscore.to_sym, object_types[model_class]
-        resolve Resolvers::ModelCreateMutation.new(model_class)
+        resolve resolver
       end
     end
 
     # Create the update mutation type for the given model class.
-    def model_mutation_update_type(model_class)
+    def model_mutation_update_type(model_class, fields: {}, resolver: nil)
       return nil unless model_class < ActiveRecord::Base
 
       object_types = @types
+      resolver = resolver || Resolvers::ModelUpdateMutation.new(model_class)
 
       GraphQL::Relay::Mutation.define do
         name "Update#{model_class.name}"
         description "Update #{model_class.name}"
 
+        # todo: use model primary key or something else
         input_field :id, !types.ID
 
         model_class.columns.each do |column|
@@ -105,20 +116,25 @@ module GraphQL::Api
           end
         end
 
+        fields.each do |field_name, field_type|
+          input_field field_name, graphql_type_of(field_type)
+        end
+
         unless object_types[model_class]
           raise("Return type not found: #{model_class.name}")
         end
 
         return_field model_class.name.underscore.to_sym, object_types[model_class]
-        resolve Resolvers::ModelUpdateMutation.new(model_class)
+        resolve resolver
       end
     end
 
     # Create the delete mutation type for the given model class.
-    def model_mutation_delete_type(model_class)
+    def model_mutation_delete_type(model_class, fields: {}, resolver: nil)
       return nil unless model_class < ActiveRecord::Base
 
       object_types = @types
+      resolver = resolver || Resolvers::ModelDeleteMutation.new(model_class)
 
       GraphQL::Relay::Mutation.define do
         name "Delete#{model_class.name}"
@@ -131,15 +147,21 @@ module GraphQL::Api
           raise("Return type not found: #{model_class.name}")
         end
 
+        fields.each do |field_name, field_type|
+          input_field field_name, graphql_type_of(field_type)
+        end
+
         return_field model_class.name.underscore.to_sym, object_types[model_class]
-        resolve Resolvers::ModelDeleteMutation.new(model_class)
+        resolve resolver
       end
     end
 
     # Command mutation.
-    def command_mutation_type(object_type, action)
+    def command_mutation_type(object_type, action, resolver: nil)
       object_types = @types
       prefix = action == :perform ? '' : action.capitalize
+
+      resolver = resolver || Resolvers::CommandMutation.new(object_type, action)
 
       GraphQL::Relay::Mutation.define do
         name "#{prefix}#{object_type.name}"
@@ -153,7 +175,7 @@ module GraphQL::Api
           return_field return_name, graphql_type_for_object(return_type, object_types)
         end
 
-        resolve Resolvers::CommandMutation.new(object_type, action)
+        resolve resolver
       end
     end
 

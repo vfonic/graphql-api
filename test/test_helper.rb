@@ -39,8 +39,8 @@ GraphQL::Api.configure do
   model Blog
   model Poro
 
-  command BlogCommand, :update
-  command BlogCommand, :delete
+  command BlogCommand, action: :update
+  command BlogCommand, action: :delete
   command BlogCreateCommand
   command PoroCommand
 
