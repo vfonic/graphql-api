@@ -11,11 +11,12 @@ module GraphQL::Api
       end
 
       def get_policy(ctx)
-        return ctx[:policy] if ctx[:policy]
+        return ctx[:policy][key] if ctx[:policy] && ctx[:policy][key]
 
         if policy_class
           policy = @policy_class.new(ctx)
-          ctx[:policy] = policy
+          ctx[:policy] ||= {}
+          ctx[:policy][key] = policy
           return policy
         end
 

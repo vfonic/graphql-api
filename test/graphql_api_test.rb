@@ -115,6 +115,19 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
     end
   end
 
+  test "policy object query unauthorized" do
+    assert_raises(GraphQL::Api::UnauthorizedException) do
+      schema_query('query { blockedQuery() { id } }')
+    end
+  end
+
+  test "policy object command unauthorized" do
+    assert_raises(GraphQL::Api::UnauthorizedException) do
+      schema_query('mutation { blockedCommand(input: {name: "foobar"}) { poro { name } } }')
+    end
+  end
+
+
   test "cannot read blog name" do
     data = schema_query("query { blog(id: #{Blog.first.id}) { id, name } }")
     assert_nil data['data']['blog']['name']

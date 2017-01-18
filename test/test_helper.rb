@@ -43,6 +43,8 @@ GraphQL::Api.configure do
   command BlogCommand, action: :delete
   command BlogCreateCommand
   command PoroCommand
+  command BlockedCommand
 
   query BlogQuery
+  query BlockedQuery
 end
