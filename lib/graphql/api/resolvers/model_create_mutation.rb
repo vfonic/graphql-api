@@ -16,8 +16,8 @@ module GraphQL::Api
           return policy.unauthorized! unless policy.create?(instance, params)
         end
 
-        item = instance.save!
-        {key => item}
+        instance.save!
+        {key => instance}
       end
 
       def key

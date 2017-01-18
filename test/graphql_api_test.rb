@@ -30,10 +30,6 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
     schema_query("query { blogs { id, name } }")
   end
 
-  test "read multiple blogs limit" do
-    schema_query("query { blogs(limit: 5) { id, name } }")
-  end
-
   test "read multiple blogs with tags" do
     schema_query("query { blogs { id, name, tags { name } } }")
   end

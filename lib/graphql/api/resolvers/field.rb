@@ -9,20 +9,21 @@ module GraphQL::Api
       end
 
       def call(obj, args, ctx)
-        if @policy_class
-          policy = @policy_class.new(ctx, obj)
-          return policy.unauthorized! unless policy.read?
+        params = args.to_h
 
-          if policy.respond_to?("access_#{@name}?")
-            return policy.unauthorized_field_access(@name) unless policy.send("access_#{@name}?")
+        if @policy_class
+          policy = @policy_class.new(ctx)
+
+          unless policy.read?(obj, params)
+            return policy.unauthorized!
           end
-          
-          obj.send(@name)
-        elsif obj.respond_to?("access_#{@name}?")
-          obj.send(@name) if obj.send("access_#{@name}?", ctx)
-        else
-          obj.send(@name)
+
+          unless policy.access_field?(obj, @name)
+            return policy.unauthorized_field_access(@name)
+          end
         end
+
+        obj.send(@name)
       end
 
     end

@@ -97,7 +97,6 @@ module GraphQL::Api
     def model_index(model, args = {})
       type = with_model(model).to_list_type
       name = model.name.camelize(:lower).pluralize
-      args[:limit] = :integer
       @graphql_objects << QueryDescription.new(name, type, args, Resolvers::ModelListQuery.new(model))
     end
 
