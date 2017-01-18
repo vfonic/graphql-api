@@ -69,8 +69,12 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
     schema_query('query { blogQuery(content_matches: ["name"]) { id, name } }', should_fail: true)
   end
 
-  test "query blog" do
-    schema_query('query { blogQuery(reqs: "required") { id, name } }')
+  test "query blogs multiple" do
+    schema_query('
+      query { blogQuery(reqs: "required") { id, name } }
+      query { blogs() { id, name } }
+      query { blog(id: 1) { id, name, content } }
+    ')
   end
 
   test "query blog secondary" do
@@ -129,7 +133,6 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
       schema_query('mutation { blockedCommand(input: {name: "foobar"}) { poro { name } } }')
     end
   end
-
 
   test "cannot read blog name" do
     data = schema_query("query { blog(id: #{Blog.first.id}) { id, name } }")

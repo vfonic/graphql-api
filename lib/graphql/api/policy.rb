@@ -44,7 +44,8 @@ module GraphQL::Api
       raise UnauthorizedException.new(user, action, instance, params)
     end
 
-    def unauthorized_field_access(field_name)
+    def unauthorized_field_access(field_name, instance, params)
+      # raise UnauthorizedException.new(user, "read.#{field_name}", instance, params)
       nil
     end
 

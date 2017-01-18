@@ -15,8 +15,8 @@ module GraphQL::Api
 
         policy = get_policy(ctx)
         if policy
-          return policy.unauthorized! unless policy.read?(obj, params)
-          return policy.unauthorized_field_access(@name) unless policy.access_field?(obj, @name)
+          return policy.unauthorized(:read, obj, params) unless policy.read?(obj, params)
+          return policy.unauthorized_field_access(@name, obj, params) unless policy.access_field?(obj, @name)
         end
 
         obj.send(@name)
