@@ -73,6 +73,9 @@ class GraphQL::Api::Test < ActiveSupport::TestCase
     schema_query('query { blogQuery(reqs: "required") { id, name } }')
   end
 
+  test "query blog secondary" do
+    schema_query('query { secondaryBlogQuery(reqs: "required") { id, name } }')
+  end
 
   test "custom mutation" do
     simple_mutation = GraphQL::Relay::Mutation.define do

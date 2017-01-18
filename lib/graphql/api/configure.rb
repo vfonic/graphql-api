@@ -67,15 +67,24 @@ module GraphQL::Api
     end
 
     def command(model, action: :perform, resolver: nil)
+      raise("Action does not exist on #{model.name}") unless model.actions[action]
+
       mutation = command_mutation_type(model, action, resolver: resolver)
       @graphql_objects << MutationDescription.new(mutation)
     end
 
     def query(model, action: :execute, resolver: nil)
+      raise("Action does not exist on #{model.name}") unless model.actions[action]
+
       returns = model.actions[action][:returns]
       args = model.actions[action][:args]
-      prefix = action == :execute ? '' : action.to_s.camelize(:lower)
-      name = prefix + model.name.camelize(:lower)
+
+      if action == :execute
+        name = model.name.camelize(:lower)
+      else
+        name = "#{action}#{model.name.camelize}"
+      end
+
       type = graphql_type_for_object(returns, @types)
       resolver = resolver || Resolvers::QueryObjectQuery.new(model, action)
       @graphql_objects << QueryDescription.new(name, type, args, resolver)

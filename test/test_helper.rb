@@ -46,5 +46,6 @@ GraphQL::Api.configure do
   command BlockedCommand
 
   query BlogQuery
+  query BlogQuery, action: :secondary
   query BlockedQuery
 end
