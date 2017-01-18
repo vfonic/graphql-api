@@ -12,31 +12,34 @@ module GraphQL::Api
       ctx[:current_user]
     end
 
-    def allowed_params(action)
-    end
+    # def execute?(command, action)
+    # end
+    #
+    # def query?(query, params)
+    # end
 
-    def create?(model, params)
+    def create?(instance, params)
       true
     end
 
-    def update?(model, params)
+    def update?(instance, params)
       true
     end
 
-    def destroy?(model, params)
+    def destroy?(instance, params)
       true
     end
 
-    def read?(model, params)
+    def read?(instance, params)
       true
     end
 
-    def access_field?(model, field)
+    def access_field?(instance, field)
       true
     end
 
-    def unauthorized!
-      raise UnauthorizedException.new
+    def unauthorized(action, instance, params)
+      raise UnauthorizedException.new(user, action, instance, params)
     end
 
     def unauthorized_field_access(field_name)

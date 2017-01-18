@@ -15,7 +15,7 @@ module GraphQL::Api
 
         policy = get_policy(ctx)
         if policy
-          return policy.unauthorized! unless policy.update?(instance, params)
+          return policy.unauthorized(:update, instance, params) unless policy.update?(instance, params)
         end
 
         instance.update!(params)

@@ -24,7 +24,7 @@ module GraphQL::Api
         if policy
           # todo: is there a more efficient way of handling this? or should you be able to skip it?
           results.each do |instance|
-            return policy.unauthorized! unless policy.read?(instance, query_args)
+            return policy.unauthorized(:read, instance, query_args) unless policy.read?(instance, query_args)
           end
         end
 
