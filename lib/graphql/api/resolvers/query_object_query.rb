@@ -5,8 +5,9 @@ module GraphQL::Api
     class QueryObjectQuery
       include Helpers
 
-      def initialize(query_object)
+      def initialize(query_object, action)
         @model = query_object
+        @action = action
       end
 
       def call(obj, args, ctx)
@@ -15,10 +16,10 @@ module GraphQL::Api
 
         policy = get_policy(ctx)
         if policy
-          return policy.unauthorized(:execute, query, params) unless policy.execute?(query, params)
+          return policy.unauthorized(@action, query, params) unless policy.execute?(query, @action, params)
         end
 
-        query.execute
+        query.send(@action)
       end
 
     end

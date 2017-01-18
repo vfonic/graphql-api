@@ -167,11 +167,11 @@ module GraphQL::Api
         name "#{prefix}#{object_type.name}"
         description "Command #{object_type.name} #{action}"
 
-        object_type.inputs.each do |input, type|
+        object_type.actions[action][:args].each do |input, type|
           input_field input, graphql_type_of(type)
         end
 
-        object_type.returns.each do |return_name, return_type|
+        object_type.actions[action][:returns].each do |return_name, return_type|
           return_field return_name, graphql_type_for_object(return_type, object_types)
         end
 

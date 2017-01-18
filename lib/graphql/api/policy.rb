@@ -16,7 +16,8 @@ module GraphQL::Api
       true
     end
 
-    def execute?(query, params)
+    def execute?(query, action, params)
+      true
     end
 
     def create?(instance, params)

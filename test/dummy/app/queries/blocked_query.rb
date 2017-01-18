@@ -1,6 +1,5 @@
 class BlockedQuery < GraphQL::Api::QueryType
-  arguments name: :string
-  return_type [Blog]
+  action :execute, returns: [Blog], args: {name: :string}
 
   def execute
     Blog.all

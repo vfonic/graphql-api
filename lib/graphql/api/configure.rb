@@ -71,11 +71,14 @@ module GraphQL::Api
       @graphql_objects << MutationDescription.new(mutation)
     end
 
-    def query(model)
-      args = model.try(:arguments)
-      name = model.name.camelize(:lower)
-      type = graphql_type_for_object(model.return_type, @types)
-      @graphql_objects << QueryDescription.new(name, type, args, Resolvers::QueryObjectQuery.new(model))
+    def query(model, action: :execute, resolver: nil)
+      returns = model.actions[action][:returns]
+      args = model.actions[action][:args]
+      prefix = action == :execute ? '' : action.to_s.camelize(:lower)
+      name = prefix + model.name.camelize(:lower)
+      type = graphql_type_for_object(returns, @types)
+      resolver = resolver || Resolvers::QueryObjectQuery.new(model, action)
+      @graphql_objects << QueryDescription.new(name, type, args, resolver)
     end
 
     def with_model(model, fields: {})

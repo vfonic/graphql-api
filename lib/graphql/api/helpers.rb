@@ -78,13 +78,5 @@ module GraphQL::Api
       graphql_type_of(column.type)
     end
 
-    def graphql_fetch(obj, ctx, name)
-      if obj.respond_to?("access_#{name}?")
-        obj.send(name) if obj.send("access_#{name}?", ctx)
-      else
-        obj.send(name)
-      end
-    end
-
   end
 end
