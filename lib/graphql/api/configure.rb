@@ -1,8 +1,13 @@
-require "graphql/api/types"
-require "graphql/api/helpers"
 require "graphql/api/resolvers/model_find_query"
 require "graphql/api/resolvers/model_list_query"
 require "graphql/api/resolvers/query_object_query"
+require "graphql/api/resolvers/field"
+require "graphql/api/resolvers/model_create_mutation"
+require "graphql/api/resolvers/model_delete_mutation"
+require "graphql/api/resolvers/model_update_mutation"
+require "graphql/api/resolvers/command_mutation"
+require "graphql/api/types"
+require "graphql/api/helpers"
 require "graphql/api/mutation_description"
 require "graphql/api/query_description"
 
@@ -11,10 +16,21 @@ include GraphQL::Api::Helpers
 module GraphQL::Api
   class Configure
     include Types
+    attr_accessor :command_resolver, :query_resolver, :field_resolver, :model_create_resolver, :model_delete_resolver,
+                  :model_update_resolver, :model_find_resolver, :model_list_resolver
 
     def initialize
       @types = {} # maps simple types to graphql query types, not needed for mutations
       @graphql_objects = []
+
+      @command_resolver = Resolvers::CommandMutation
+      @query_resolver = Resolvers::QueryObjectQuery
+      @field_resolver = Resolvers::Field
+      @model_create_resolver = Resolvers::ModelCreateMutation
+      @model_update_resolver = Resolvers::ModelUpdateMutation
+      @model_delete_resolver = Resolvers::ModelDeleteMutation
+      @model_find_resolver = Resolvers::ModelFindQuery
+      @model_list_resolver = Resolvers::ModelListQuery
     end
 
     # Return the graphQL schema
@@ -69,7 +85,7 @@ module GraphQL::Api
     def command(model, action: :perform, resolver: nil)
       raise("Action does not exist on #{model.name}") unless model.actions[action]
 
-      mutation = command_mutation_type(model, action, resolver: resolver)
+      mutation = command_mutation_type(model, action, resolver: resolver, resolver_class: command_resolver)
       @graphql_objects << MutationDescription.new(mutation)
     end
 
@@ -86,44 +102,48 @@ module GraphQL::Api
       end
 
       type = graphql_type_for_object(returns, @types)
-      resolver = resolver || Resolvers::QueryObjectQuery.new(model, action)
+      resolver = resolver || query_resolver.new(model, action)
       @graphql_objects << QueryDescription.new(name, type, args, resolver)
     end
 
     def with_model(model, fields: {})
       query = @types[model]
       unless query
-        query = model_query_type(model, fields: fields)
+        query = model_query_type(model, fields: fields, resolver_class: field_resolver)
         @types[model] = query
       end
       query
     end
 
-    def model_show(model, args: {}, fields: {})
+    def model_show(model, args: {}, fields: {}, resolver: nil)
       type = with_model(model, fields: fields)
       name = model.name.camelize(:lower)
       args[:id] = :id
-      @graphql_objects << QueryDescription.new(name, type, args, Resolvers::ModelFindQuery.new(model))
+
+      resolver = resolver || model_find_resolver.new(model)
+      @graphql_objects << QueryDescription.new(name, type, args, resolver)
     end
 
-    def model_index(model, args = {})
+    def model_index(model, args: {}, resolver: nil)
       type = with_model(model).to_list_type
       name = model.name.camelize(:lower).pluralize
-      @graphql_objects << QueryDescription.new(name, type, args, Resolvers::ModelListQuery.new(model))
+
+      resolver = resolver || model_list_resolver.new(model)
+      @graphql_objects << QueryDescription.new(name, type, args, resolver)
     end
 
     def model_create(model, resolver: nil)
-      mutation = model_mutation_create_type(model, resolver: resolver)
+      mutation = model_mutation_create_type(model, resolver: resolver, resolver_class: model_create_resolver)
       @graphql_objects << MutationDescription.new(mutation)
     end
 
     def model_update(model, resolver: nil)
-      mutation = model_mutation_update_type(model, resolver: resolver)
+      mutation = model_mutation_update_type(model, resolver: resolver, resolver_class: model_update_resolver)
       @graphql_objects << MutationDescription.new(mutation)
     end
 
     def model_delete(model, resolver: nil)
-      mutation = model_mutation_delete_type(model, resolver: resolver)
+      mutation = model_mutation_delete_type(model, resolver: resolver, resolver_class: model_delete_resolver)
       @graphql_objects << MutationDescription.new(mutation)
     end
 
