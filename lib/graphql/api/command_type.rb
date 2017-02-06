@@ -19,6 +19,10 @@ module GraphQL::Api
       @ctx[:current_user]
     end
 
+    def inputs
+      @args
+    end
+
     def arguments
       @args
     end

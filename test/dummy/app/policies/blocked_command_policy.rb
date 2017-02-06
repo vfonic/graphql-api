@@ -1,4 +1,4 @@
-class BlockedCommandPolicy < GraphQL::Api::Policy
+class BlockedCommandPolicy < GraphQL::Api::CommandPolicy
 
   def perform?(*)
     false

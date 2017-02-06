@@ -23,6 +23,26 @@ module GraphQL::Api
         false
       end
 
+      def authorized?(action, ctx, instance, args)
+        policy = get_policy(ctx)
+        policy && check_auth?(action, policy, instance, args)
+      end
+
+      def check_auth?(action, policy, instance, args)
+        case action
+          when :create
+            return policy.create?(instance, args)
+          when :update
+            return policy.update?(instance, args)
+          when :destroy
+            return policy.destroy?(instance, args)
+          when :read
+            return policy.read?(instance, args)
+          else
+            return true
+        end
+      end
+
     end
   end
 end

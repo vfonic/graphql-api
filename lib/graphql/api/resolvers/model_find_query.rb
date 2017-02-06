@@ -10,12 +10,11 @@ module GraphQL::Api
       end
 
       def call(obj, args, ctx)
-        params = args.to_h
-        instance = @model.find_by!(params)
+        instance = @model.find_by!(args.to_h)
 
         policy = get_policy(ctx)
-        if policy
-          return policy.unauthorized(:read, instance, params) unless policy.read?(instance, params)
+        if policy && !policy.read?(instance, args)
+          return policy.unauthorized(:read, instance, args)
         end
 
         instance

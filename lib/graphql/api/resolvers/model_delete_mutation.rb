@@ -11,11 +11,10 @@ module GraphQL::Api
 
       def call(obj, args, ctx)
         instance = @model.find(args[:id])
-        params = args.to_h
 
         policy = get_policy(ctx)
-        if policy
-          return policy.unauthorized(:destroy, instance, params) unless policy.destroy?(instance, params)
+        if policy && !policy.destroy?(instance, args)
+          return policy.unauthorized(:create, instance, args)
         end
 
         instance.destroy!

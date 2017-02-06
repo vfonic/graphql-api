@@ -1,5 +1,7 @@
 require "graphql/api/version"
 require "graphql/api/policy"
+require "graphql/api/command_policy"
+require "graphql/api/query_policy"
 require "graphql/api/command_type"
 require "graphql/api/query_type"
 require "graphql/api/configure"

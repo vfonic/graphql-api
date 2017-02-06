@@ -10,12 +10,11 @@ module GraphQL::Api
       end
 
       def call(obj, args, ctx)
-        params = args.to_h # ensure to_h is called as args is not a hash
-        instance = @model.new(params)
+        instance = @model.new(args.to_h)
 
         policy = get_policy(ctx)
-        if policy
-          return policy.unauthorized(:create, instance, params) unless policy.create?(instance, params)
+        if policy && !policy.create?(instance, args)
+          return policy.unauthorized(:create, instance, args)
         end
 
         instance.save!

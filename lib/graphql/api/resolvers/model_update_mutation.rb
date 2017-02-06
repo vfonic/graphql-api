@@ -11,14 +11,13 @@ module GraphQL::Api
 
       def call(obj, args, ctx)
         instance = @model.find(args[:id])
-        params = args.to_h
 
         policy = get_policy(ctx)
-        if policy
-          return policy.unauthorized(:update, instance, params) unless policy.update?(instance, params)
+        if policy && !policy.update?(instance, args)
+          return policy.unauthorized(:update, instance, args)
         end
 
-        instance.update!(params)
+        instance.update!(args.to_h)
         {key => instance}
       end
 

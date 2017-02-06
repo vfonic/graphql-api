@@ -1,4 +1,4 @@
-class BlockedQueryPolicy < GraphQL::Api::Policy
+class BlockedQueryPolicy < GraphQL::Api::QueryPolicy
 
   def execute?(*)
     false

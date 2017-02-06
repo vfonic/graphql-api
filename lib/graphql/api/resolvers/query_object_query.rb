@@ -11,12 +11,11 @@ module GraphQL::Api
       end
 
       def call(obj, args, ctx)
-        params = args.to_h
         query = @model.new(args, ctx)
 
         policy = get_policy(ctx)
-        if policy
-          return policy.unauthorized(@action, query, params) unless policy.execute?(query, @action, params)
+        if policy && !policy.execute?(query, @action, args)
+          return policy.unauthorized(@action, query, args)
         end
 
         query.send(@action)
