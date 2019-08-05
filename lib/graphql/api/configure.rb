@@ -35,7 +35,11 @@ module GraphQL::Api
 
     # Return the graphQL schema
     def schema
-      @schema ||= GraphQL::Schema.define(query: graphql_query, mutation: graphql_mutation)
+      @schema ||= GraphQL::Schema.define(
+        query: graphql_query,
+        mutation: graphql_mutation,
+        resolve_type: lambda { |obj, ctx| @types[obj.class] }
+      )
     end
 
     def with_defaults(commands: [], queries: [], models: [])
