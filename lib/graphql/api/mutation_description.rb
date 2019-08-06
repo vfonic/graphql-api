@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GraphQL::Api
   class MutationDescription
     attr_accessor :name, :type
@@ -21,6 +23,5 @@ module GraphQL::Api
     def to_s
       "#<Mutation #{name} type=#{type.name}>"
     end
-
   end
 end

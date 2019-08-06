@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GraphQL::Api
   class CommandType
     attr_accessor :ctx, :args
@@ -12,7 +14,7 @@ module GraphQL::Api
     end
 
     def self.action(action, returns: {}, args: {})
-      actions[action] = {returns: returns, args: args}
+      actions[action] = { returns: returns, args: args }
     end
 
     def current_user
@@ -26,6 +28,5 @@ module GraphQL::Api
     def arguments
       @args
     end
-
   end
 end

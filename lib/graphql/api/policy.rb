@@ -1,4 +1,6 @@
-require "graphql/api/unauthorized_exception"
+# frozen_string_literal: true
+
+require 'graphql/api/unauthorized_exception'
 
 module GraphQL::Api
   class Policy
@@ -12,23 +14,23 @@ module GraphQL::Api
       ctx[:current_user]
     end
 
-    def create?(instance, args)
+    def create?(_instance, _args)
       true
     end
 
-    def update?(instance, params)
+    def update?(_instance, _params)
       true
     end
 
-    def destroy?(instance, params)
+    def destroy?(_instance, _params)
       true
     end
 
-    def read?(instance, params)
+    def read?(_instance, _params)
       true
     end
 
-    def access_field?(instance, field)
+    def access_field?(_instance, _field)
       true
     end
 
@@ -36,10 +38,9 @@ module GraphQL::Api
       raise UnauthorizedException.new(user, action, instance, params)
     end
 
-    def unauthorized_field_access(field_name, instance, params)
+    def unauthorized_field_access(_field_name, _instance, _params)
       # raise UnauthorizedException.new(user, "read.#{field_name}", instance, params)
       nil
     end
-
   end
 end

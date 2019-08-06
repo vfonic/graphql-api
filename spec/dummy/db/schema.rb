@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -10,37 +12,35 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161001063245) do
-
-  create_table "authors", force: :cascade do |t|
-    t.string   "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+ActiveRecord::Schema.define(version: 20_161_001_063_245) do
+  create_table 'authors', force: :cascade do |t|
+    t.string   'name'
+    t.datetime 'created_at', null: false
+    t.datetime 'updated_at', null: false
   end
 
-  create_table "blog_tags", force: :cascade do |t|
-    t.string   "name"
-    t.integer  "tag_id"
-    t.integer  "blog_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["blog_id"], name: "index_blog_tags_on_blog_id"
-    t.index ["tag_id"], name: "index_blog_tags_on_tag_id"
+  create_table 'blog_tags', force: :cascade do |t|
+    t.string   'name'
+    t.integer  'tag_id'
+    t.integer  'blog_id'
+    t.datetime 'created_at', null: false
+    t.datetime 'updated_at', null: false
+    t.index ['blog_id'], name: 'index_blog_tags_on_blog_id'
+    t.index ['tag_id'], name: 'index_blog_tags_on_tag_id'
   end
 
-  create_table "blogs", force: :cascade do |t|
-    t.string   "name"
-    t.text     "content"
-    t.integer  "author_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["author_id"], name: "index_blogs_on_author_id"
+  create_table 'blogs', force: :cascade do |t|
+    t.string   'name'
+    t.text     'content'
+    t.integer  'author_id'
+    t.datetime 'created_at', null: false
+    t.datetime 'updated_at', null: false
+    t.index ['author_id'], name: 'index_blogs_on_author_id'
   end
 
-  create_table "tags", force: :cascade do |t|
-    t.string   "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+  create_table 'tags', force: :cascade do |t|
+    t.string   'name'
+    t.datetime 'created_at', null: false
+    t.datetime 'updated_at', null: false
   end
-
 end

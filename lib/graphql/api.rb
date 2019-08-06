@@ -1,15 +1,16 @@
-require "graphql/api/version"
-require "graphql/api/policy"
-require "graphql/api/command_policy"
-require "graphql/api/query_policy"
-require "graphql/api/command_type"
-require "graphql/api/query_type"
-require "graphql/api/configure"
+# frozen_string_literal: true
+
+require 'graphql/api/version'
+require 'graphql/api/policy'
+require 'graphql/api/command_policy'
+require 'graphql/api/query_policy'
+require 'graphql/api/command_type'
+require 'graphql/api/query_type'
+require 'graphql/api/configure'
 
 module GraphQL
   module Api
-
-    def self.schema(opts={})
+    def self.schema(opts = {})
       @schema ||= configure_default_schema(opts)
     end
 
@@ -25,6 +26,5 @@ module GraphQL
       config.with_defaults(opts)
       config.schema
     end
-
   end
 end

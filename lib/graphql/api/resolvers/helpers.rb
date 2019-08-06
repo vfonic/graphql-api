@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 module GraphQL::Api
   module Resolvers
     module Helpers
-
       def key
         @key ||= @model.name.underscore.to_sym
       end
@@ -30,19 +31,18 @@ module GraphQL::Api
 
       def check_auth?(action, policy, instance, args)
         case action
-          when :create
-            return policy.create?(instance, args)
-          when :update
-            return policy.update?(instance, args)
-          when :destroy
-            return policy.destroy?(instance, args)
-          when :read
-            return policy.read?(instance, args)
-          else
-            return true
+        when :create
+          policy.create?(instance, args)
+        when :update
+          policy.update?(instance, args)
+        when :destroy
+          policy.destroy?(instance, args)
+        when :read
+          policy.read?(instance, args)
+        else
+          true
         end
       end
-
     end
   end
 end

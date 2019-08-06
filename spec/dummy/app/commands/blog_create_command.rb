@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class BlogCreateCommand < GraphQL::Api::CommandType
-  action :perform, returns: {blog: Blog}, args: {name: :string, tags: [:string]}
+  action :perform, returns: { blog: Blog }, args: { name: :string, tags: [:string] }
 
   def perform
     blog = Blog.create!(name: args[:name], author_id: Author.first.id)
@@ -8,7 +10,6 @@ class BlogCreateCommand < GraphQL::Api::CommandType
       blog.blog_tags.create!(tag_id: t.id)
     end
 
-    {blog: blog}
+    { blog: blog }
   end
-
 end

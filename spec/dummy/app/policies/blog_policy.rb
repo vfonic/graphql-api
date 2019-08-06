@@ -1,5 +1,6 @@
-class BlogPolicy < GraphQL::Api::Policy
+# frozen_string_literal: true
 
+class BlogPolicy < GraphQL::Api::Policy
   def read?(*)
     ctx[:test_key].nil?
   end
@@ -16,8 +17,7 @@ class BlogPolicy < GraphQL::Api::Policy
     ctx[:test_key].nil?
   end
 
-  def access_field?(object, field)
+  def access_field?(_object, field)
     field.to_sym != :name
   end
-
 end

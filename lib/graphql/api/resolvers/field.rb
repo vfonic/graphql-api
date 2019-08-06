@@ -1,4 +1,6 @@
-require "graphql/api/resolvers/helpers"
+# frozen_string_literal: true
+
+require 'graphql/api/resolvers/helpers'
 
 module GraphQL::Api
   module Resolvers
@@ -21,7 +23,6 @@ module GraphQL::Api
 
         obj.send(@name)
       end
-
     end
   end
 end

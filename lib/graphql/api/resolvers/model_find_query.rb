@@ -1,4 +1,6 @@
-require "graphql/api/resolvers/helpers"
+# frozen_string_literal: true
+
+require 'graphql/api/resolvers/helpers'
 
 module GraphQL::Api
   module Resolvers
@@ -9,17 +11,14 @@ module GraphQL::Api
         @model = model
       end
 
-      def call(obj, args, ctx)
+      def call(_obj, args, ctx)
         instance = @model.find_by!(args.to_h)
 
         policy = get_policy(ctx)
-        if policy && !policy.read?(instance, args)
-          return policy.unauthorized(:read, instance, args)
-        end
+        return policy.unauthorized(:read, instance, args) if policy && !policy.read?(instance, args)
 
         instance
       end
-
     end
   end
 end

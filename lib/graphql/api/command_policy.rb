@@ -1,4 +1,6 @@
-require "graphql/api/unauthorized_exception"
+# frozen_string_literal: true
+
+require 'graphql/api/unauthorized_exception'
 
 module GraphQL::Api
   class CommandPolicy
@@ -12,7 +14,7 @@ module GraphQL::Api
       ctx[:current_user]
     end
 
-    def perform?(cmd, action, params)
+    def perform?(_cmd, _action, _params)
       true
     end
 
@@ -20,7 +22,7 @@ module GraphQL::Api
       raise UnauthorizedException.new(user, action, instance, params)
     end
 
-    def unauthorized_field_access(field_name, instance, params)
+    def unauthorized_field_access(_field_name, _instance, _params)
       nil
     end
   end

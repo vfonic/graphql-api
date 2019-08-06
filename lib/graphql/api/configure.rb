@@ -1,15 +1,17 @@
-require "graphql/api/resolvers/model_find_query"
-require "graphql/api/resolvers/model_list_query"
-require "graphql/api/resolvers/query_object_query"
-require "graphql/api/resolvers/field"
-require "graphql/api/resolvers/model_create_mutation"
-require "graphql/api/resolvers/model_delete_mutation"
-require "graphql/api/resolvers/model_update_mutation"
-require "graphql/api/resolvers/command_mutation"
-require "graphql/api/types"
-require "graphql/api/helpers"
-require "graphql/api/mutation_description"
-require "graphql/api/query_description"
+# frozen_string_literal: true
+
+require 'graphql/api/resolvers/model_find_query'
+require 'graphql/api/resolvers/model_list_query'
+require 'graphql/api/resolvers/query_object_query'
+require 'graphql/api/resolvers/field'
+require 'graphql/api/resolvers/model_create_mutation'
+require 'graphql/api/resolvers/model_delete_mutation'
+require 'graphql/api/resolvers/model_update_mutation'
+require 'graphql/api/resolvers/command_mutation'
+require 'graphql/api/types'
+require 'graphql/api/helpers'
+require 'graphql/api/mutation_description'
+require 'graphql/api/query_description'
 
 include GraphQL::Api::Helpers
 
@@ -71,16 +73,14 @@ module GraphQL::Api
     end
 
     def mutation_description(mutation_description)
-      unless mutation_description.mutation_type?
-        raise("Mutation must be called with a MutationDescription")
-      end
+      raise('Mutation must be called with a MutationDescription') unless mutation_description.mutation_type?
+
       @graphql_objects << mutation_description
     end
 
     def query_description(query_description)
-      unless query_description.query_type?
-        raise("Mutation must be called with a MutationDescription")
-      end
+      raise('Mutation must be called with a MutationDescription') unless query_description.query_type?
+
       @graphql_objects << query_description
     end
 
@@ -97,14 +97,14 @@ module GraphQL::Api
       returns = model.actions[action][:returns]
       args = model.actions[action][:args]
 
-      if action == :execute
-        name = model.name.camelize(:lower)
-      else
-        name = "#{action}#{model.name.camelize}"
-      end
+      name = if action == :execute
+               model.name.camelize(:lower)
+             else
+               "#{action}#{model.name.camelize}"
+             end
 
       type = graphql_type_for_object(returns, @types)
-      resolver = resolver || query_resolver.new(model, action)
+      resolver ||= query_resolver.new(model, action)
       @graphql_objects << QueryDescription.new(name, type, args, resolver)
     end
 
@@ -122,7 +122,7 @@ module GraphQL::Api
       name = model.name.camelize(:lower)
       args[:id] = :id
 
-      resolver = resolver || model_find_resolver.new(model)
+      resolver ||= model_find_resolver.new(model)
       @graphql_objects << QueryDescription.new(name, type, args, resolver)
     end
 
@@ -130,7 +130,7 @@ module GraphQL::Api
       type = with_model(model).to_list_type
       name = model.name.camelize(:lower).pluralize
 
-      resolver = resolver || model_list_resolver.new(model)
+      resolver ||= model_list_resolver.new(model)
       @graphql_objects << QueryDescription.new(name, type, args, resolver)
     end
 
@@ -158,9 +158,7 @@ module GraphQL::Api
         instance_eval(&block) if block
 
         graphql_objects.each do |object|
-          unless object.query_type?
-            next
-          end
+          next unless object.query_type?
 
           field(object.name) do
             type object.type
@@ -182,14 +180,11 @@ module GraphQL::Api
         instance_eval(&block) if block
 
         graphql_objects.each do |object|
-          unless object.mutation_type?
-            next
-          end
+          next unless object.mutation_type?
 
           field(object.name, field: object.type.field)
         end
       end
     end
-
   end
 end

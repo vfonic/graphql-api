@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Poro
   attr_accessor :name
   def initialize(name)
@@ -6,8 +8,7 @@ class Poro
 
   def self.fields
     {
-        name: :string
+      name: :string
     }
   end
-
 end

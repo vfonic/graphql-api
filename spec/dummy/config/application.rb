@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require_relative 'boot'
 
 require 'rails/all'
 
 Bundler.require(*Rails.groups)
-require "graphql/api"
+require 'graphql/api'
 
 module Dummy
   class Application < Rails::Application
@@ -17,4 +19,3 @@ module Dummy
     config.autoload_paths << Rails.root.join('lib')
   end
 end
-

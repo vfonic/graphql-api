@@ -1,5 +1,7 @@
-require "graphql/api/helpers"
-require "graphql"
+# frozen_string_literal: true
+
+require 'graphql/api/helpers'
+require 'graphql'
 
 module GraphQL::Api
   module Types
@@ -35,9 +37,7 @@ module GraphQL::Api
         if model_class.respond_to?(:reflections)
           model_class.reflections.each do |name, association|
             association_type = object_types[association.class_name.constantize]
-            unless association_type
-              raise("Association not found: #{association.class_name}")
-            end
+            raise("Association not found: #{association.class_name}") unless association_type
 
             field(name) do
               if association.collection?
@@ -49,7 +49,6 @@ module GraphQL::Api
             end
           end
         end
-
       end
     end
 
@@ -58,7 +57,7 @@ module GraphQL::Api
       return nil unless model_class < ActiveRecord::Base
 
       object_types = @types
-      resolver = resolver || resolver_class.new(model_class)
+      resolver ||= resolver_class.new(model_class)
 
       GraphQL::Relay::Mutation.define do
         name "Create#{model_class.name}"
@@ -78,9 +77,7 @@ module GraphQL::Api
           input_field field_name, graphql_type_of(field_type)
         end
 
-        unless object_types[model_class]
-          raise("Return type not found: #{model_class.name}")
-        end
+        raise("Return type not found: #{model_class.name}") unless object_types[model_class]
 
         return_field model_class.name.underscore.to_sym, object_types[model_class]
         resolve resolver
@@ -92,13 +89,13 @@ module GraphQL::Api
       return nil unless model_class < ActiveRecord::Base
 
       object_types = @types
-      resolver = resolver || resolver_class.new(model_class)
+      resolver ||= resolver_class.new(model_class)
 
       GraphQL::Relay::Mutation.define do
         name "Update#{model_class.name}"
         description "Update #{model_class.name}"
 
-        # todo: use model primary key or something else
+        # TODO: use model primary key or something else
         input_field :id, !types.ID
 
         model_class.columns.each do |column|
@@ -115,9 +112,7 @@ module GraphQL::Api
           input_field field_name, graphql_type_of(field_type)
         end
 
-        unless object_types[model_class]
-          raise("Return type not found: #{model_class.name}")
-        end
+        raise("Return type not found: #{model_class.name}") unless object_types[model_class]
 
         return_field model_class.name.underscore.to_sym, object_types[model_class]
         resolve resolver
@@ -129,18 +124,16 @@ module GraphQL::Api
       return nil unless model_class < ActiveRecord::Base
 
       object_types = @types
-      resolver = resolver || resolver_class.new(model_class)
+      resolver ||= resolver_class.new(model_class)
 
       GraphQL::Relay::Mutation.define do
         name "Delete#{model_class.name}"
         description "Delete #{model_class.name}"
 
-        # todo: allow for different primary key
+        # TODO: allow for different primary key
         input_field :id, !types.ID
 
-        unless object_types[model_class]
-          raise("Return type not found: #{model_class.name}")
-        end
+        raise("Return type not found: #{model_class.name}") unless object_types[model_class]
 
         fields.each do |field_name, field_type|
           input_field field_name, graphql_type_of(field_type)
@@ -156,7 +149,7 @@ module GraphQL::Api
       object_types = @types
       prefix = action == :perform ? '' : action.capitalize
 
-      resolver = resolver || resolver_class.new(object_type, action)
+      resolver ||= resolver_class.new(object_type, action)
 
       GraphQL::Relay::Mutation.define do
         name "#{prefix}#{object_type.name}"
@@ -173,6 +166,5 @@ module GraphQL::Api
         resolve resolver
       end
     end
-
   end
 end

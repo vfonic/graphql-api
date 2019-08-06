@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 module GraphQL::Api
-  class UnauthorizedException < Exception
+  class UnauthorizedException < RuntimeError
     attr_accessor :user, :action, :instance, :params
 
     def initialize(user = nil, action = nil, instance = nil, params = nil)
@@ -11,10 +13,9 @@ module GraphQL::Api
 
     def as_json
       {
-          action: action,
-          object: instance.class.name,
+        action: action,
+        object: instance.class.name
       }
     end
-
   end
 end

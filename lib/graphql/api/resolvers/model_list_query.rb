@@ -1,4 +1,6 @@
-require "graphql/api/resolvers/helpers"
+# frozen_string_literal: true
+
+require 'graphql/api/resolvers/helpers'
 
 module GraphQL::Api
   module Resolvers
@@ -9,12 +11,12 @@ module GraphQL::Api
         @model = model
       end
 
-      def call(obj, args, ctx)
+      def call(_obj, args, ctx)
         results = query(ctx, args)
 
         policy = get_policy(ctx)
         if policy
-          # todo: is there a more efficient way of handling this? or should you be able to skip it?
+          # TODO: is there a more efficient way of handling this? or should you be able to skip it?
           results.each do |instance|
             return policy.unauthorized(:read, instance, args) unless policy.read?(instance, args)
           end
@@ -34,7 +36,6 @@ module GraphQL::Api
 
         results
       end
-
     end
   end
 end

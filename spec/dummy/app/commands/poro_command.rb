@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 class PoroCommand < GraphQL::Api::CommandType
-  action :perform, returns: {poro: Poro}, args: {name: :string!}
+  action :perform, returns: { poro: Poro }, args: { name: :string! }
 
   def perform
-    {poro: Poro.new(args[:name])}
+    { poro: Poro.new(args[:name]) }
   end
-
 end

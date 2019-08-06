@@ -1,5 +1,6 @@
-module GraphQL::Api
+# frozen_string_literal: true
 
+module GraphQL::Api
   class QueryDescription
     attr_accessor :name, :type, :args, :resolver
 
@@ -21,7 +22,5 @@ module GraphQL::Api
     def to_s
       "#<Query #{name} type=#{type.name}>"
     end
-
   end
-
 end
