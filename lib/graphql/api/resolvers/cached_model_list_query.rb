@@ -8,7 +8,7 @@ module GraphQL::Api
     class CachedModelListQuery < ModelListQuery
       include Helpers
 
-      def call(_obj, args, ctx)
+      def call(_obj, args, ctx) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
         query_args = args.to_h
         policy = get_policy(ctx)
 

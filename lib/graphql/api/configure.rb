@@ -13,10 +13,10 @@ require 'graphql/api/helpers'
 require 'graphql/api/mutation_description'
 require 'graphql/api/query_description'
 
-include GraphQL::Api::Helpers
+include GraphQL::Api::Helpers # rubocop:disable Style/MixinUsage
 
 module GraphQL::Api
-  class Configure
+  class Configure # rubocop:disable Metrics/ClassLength
     include Types
     attr_accessor :command_resolver, :query_resolver, :field_resolver, :model_create_resolver, :model_delete_resolver,
                   :model_update_resolver, :model_find_resolver, :model_list_resolver
@@ -40,7 +40,7 @@ module GraphQL::Api
       @schema ||= GraphQL::Schema.define(query: graphql_query, mutation: graphql_mutation)
     end
 
-    def with_defaults(commands: [], queries: [], models: [])
+    def with_defaults(commands: [], queries: [], models: []) # rubocop:disable Metrics/MethodLength
       (all_constants('models') + models).each do |model_class|
         model(model_class)
       end
@@ -54,7 +54,7 @@ module GraphQL::Api
       end
     end
 
-    def model(model, only: nil, args: {})
+    def model(model, only: nil, args: {}) # rubocop:disable Metrics/MethodLength
       if model < ActiveRecord::Base
         if only
           only.each do |method|
@@ -91,7 +91,7 @@ module GraphQL::Api
       @graphql_objects << MutationDescription.new(mutation)
     end
 
-    def query(model, action: :execute, resolver: nil)
+    def query(model, action: :execute, resolver: nil) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       raise("Action does not exist on #{model.name}") unless model.actions[action]
 
       returns = model.actions[action][:returns]
@@ -149,7 +149,7 @@ module GraphQL::Api
       @graphql_objects << MutationDescription.new(mutation)
     end
 
-    def graphql_query(&block)
+    def graphql_query(&block) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       graphql_objects = @graphql_objects
       GraphQL::ObjectType.define do
         name 'Query'

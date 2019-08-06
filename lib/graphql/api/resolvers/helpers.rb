@@ -29,6 +29,7 @@ module GraphQL::Api
         policy && check_auth?(action, policy, instance, args)
       end
 
+      # rubocop:disable Metrics/MethodLength
       def check_auth?(action, policy, instance, args)
         case action
         when :create
@@ -43,6 +44,7 @@ module GraphQL::Api
           true
         end
       end
+      # rubocop:enable Metrics/MethodLength
     end
   end
 end

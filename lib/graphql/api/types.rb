@@ -4,14 +4,15 @@ require 'graphql/api/helpers'
 require 'graphql'
 
 module GraphQL::Api
-  module Types
+  module Types # rubocop:disable Metrics/ModuleLength
     include Helpers
 
     # Create the query type for the given model class.
+    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     def model_query_type(model_class, fields: {}, resolver_class: nil)
       object_types = @types
 
-      GraphQL::ObjectType.define do
+      GraphQL::ObjectType.define do # rubocop:disable Metrics/BlockLength
         name model_class.name
         description "Get #{model_class.name}"
 
@@ -51,8 +52,10 @@ module GraphQL::Api
         end
       end
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
     # Create the create mutation type for the given model class.
+    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     def model_mutation_create_type(model_class, fields: {}, resolver: nil, resolver_class: nil)
       return nil unless model_class < ActiveRecord::Base
 
@@ -83,8 +86,10 @@ module GraphQL::Api
         resolve resolver
       end
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
     # Create the update mutation type for the given model class.
+    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     def model_mutation_update_type(model_class, fields: {}, resolver: nil, resolver_class: nil)
       return nil unless model_class < ActiveRecord::Base
 
@@ -118,8 +123,10 @@ module GraphQL::Api
         resolve resolver
       end
     end
+    # rubocop:enable Metrics/MethodLength
 
     # Create the delete mutation type for the given model class.
+    # rubocop:disable Metrics/MethodLength
     def model_mutation_delete_type(model_class, fields: {}, resolver: nil, resolver_class: nil)
       return nil unless model_class < ActiveRecord::Base
 
@@ -143,8 +150,9 @@ module GraphQL::Api
         resolve resolver
       end
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
-    # Command mutation.
+    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     def command_mutation_type(object_type, action, resolver: nil, resolver_class: nil)
       object_types = @types
       prefix = action == :perform ? '' : action.capitalize
@@ -166,5 +174,6 @@ module GraphQL::Api
         resolve resolver
       end
     end
+    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
   end
 end

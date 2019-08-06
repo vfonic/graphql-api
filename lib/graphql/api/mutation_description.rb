@@ -16,7 +16,7 @@ module GraphQL::Api
       false
     end
 
-    def name
+    def name # rubocop:disable Lint/DuplicateMethods
       @type.name.camelize(:lower)
     end
 

@@ -1,28 +1,27 @@
 # frozen_string_literal: true
 
-$:.push File.expand_path('lib', __dir__)
-
-# Maintain your gem's version:
+lib = File.expand_path('lib', __dir__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'graphql/api/version'
 
-# Describe your gem and declare its dependencies:
-Gem::Specification.new do |s|
-  s.name        = 'graphql-api'
-  s.version     = GraphQL::Api::VERSION
-  s.authors     = ['Colin Walker']
-  s.email       = ['colinwalker270@gmail.com']
-  s.homepage    = 'https://github.com/coldog/graphql-api'
-  s.summary     = 'Rails graphql framework.'
-  s.license     = 'MIT'
+Gem::Specification.new do |spec|
+  spec.name        = 'graphql-api'
+  spec.version     = GraphQL::Api::VERSION
+  spec.authors     = ['Colin Walker']
+  spec.email       = ['colinwalker270@gmail.com']
+  spec.homepage    = 'https://github.com/coldog/graphql-api'
+  spec.summary     = 'Rails API GraphQL connection with ease'
+  spec.license     = 'MIT'
 
-  s.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
+  spec.files       = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  spec.require_paths = ['lib']
 
-  s.add_dependency 'graphql', '~> 1.4'
-  s.add_dependency 'rails', '>= 4.2.6'
+  spec.add_dependency 'graphql', '~> 1.4'
+  spec.add_dependency 'rails', '>= 4.2.6'
 
-  s.add_development_dependency 'database_cleaner'
-  s.add_development_dependency 'factory_bot_rails'
-  s.add_development_dependency 'pry-rails'
-  s.add_development_dependency 'rspec-rails'
-  s.add_development_dependency 'sqlite3', '~> 1.3.6'
+  spec.add_development_dependency 'database_cleaner'
+  spec.add_development_dependency 'factory_bot_rails'
+  spec.add_development_dependency 'pry-rails'
+  spec.add_development_dependency 'rspec-rails'
+  spec.add_development_dependency 'sqlite3', '~> 1.3.6'
 end

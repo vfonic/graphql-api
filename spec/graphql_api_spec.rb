@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable RSpec/FilePath
 require 'rails_helper'
 
 RSpec.describe GraphQL::Api do
@@ -47,7 +48,9 @@ RSpec.describe GraphQL::Api do
 
   # Commands
   xit 'mutation command' do
-    schema_query('mutation { blogCreateCommand(input: {tags: ["test", "testing"], name: "hello"}) { blog { id, tags { name } } } }')
+    schema_query(%{
+      mutation { blogCreateCommand(input: {tags: ["test", "testing"], name: "hello"}) { blog { id, tags { name } } } }
+    })
   end
 
   it 'mutation poro return' do
@@ -79,7 +82,7 @@ RSpec.describe GraphQL::Api do
     schema_query('query { secondaryBlogQuery(reqs: "required") { id, name } }')
   end
 
-  it 'custom mutation' do
+  it 'custom mutation' do # rubocop:disable RSpec/ExampleLength
     simple_mutation = GraphQL::Relay::Mutation.define do
       input_field :name, !types.String
       return_field :item, types.String
@@ -104,7 +107,9 @@ RSpec.describe GraphQL::Api do
 
   it 'policy object create failing' do
     expect do
-      schema_query('mutation { createBlog(input: {name: "test", author_id: 2}) { blog { id } } }', context: { test_key: blog.id })
+      schema_query(
+        'mutation { createBlog(input: {name: "test", author_id: 2}) { blog { id } } }', context: { test_key: blog.id }
+      )
     end.to raise_error GraphQL::Api::UnauthorizedException
   end
 
@@ -137,3 +142,5 @@ RSpec.describe GraphQL::Api do
     assert_nil data['data']['blog']['name']
   end
 end
+
+# rubocop:enable RSpec/FilePath
