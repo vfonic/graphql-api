@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/vfonic/stylecheck.git
-  revision: 0693b5de07c2df6c3a23571876d8dbb8302d19ee
+  revision: a2c66d0820ad32523d0f35448361290c77157435
   specs:
-    stylecheck (6.0.0)
+    stylecheck (7.0.0)
       rake
       rubocop (>= 0.72.0)
       rubocop-performance
@@ -95,7 +95,7 @@ GEM
       method_source (~> 0.8.1)
     pry-rails (0.3.9)
       pry (>= 0.10.4)
-    rack (2.0.1)
+    rack (2.0.7)
     rack-test (0.6.3)
       rack (>= 1.0)
     rails (5.0.1)
@@ -122,7 +122,7 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
     rainbow (3.0.0)
-    rake (12.0.0)
+    rake (12.3.3)
     rspec-core (3.8.2)
       rspec-support (~> 3.8.0)
     rspec-expectations (3.8.4)
