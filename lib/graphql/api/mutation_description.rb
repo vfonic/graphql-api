@@ -2,7 +2,7 @@
 
 module GraphQL::Api
   class MutationDescription
-    attr_accessor :name, :type
+    attr_reader :type
 
     def initialize(type)
       @type = type
@@ -16,7 +16,7 @@ module GraphQL::Api
       false
     end
 
-    def name # rubocop:disable Lint/DuplicateMethods
+    def name
       @type.name.camelize(:lower)
     end
 
