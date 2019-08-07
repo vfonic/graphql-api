@@ -2,19 +2,19 @@
 
 class BlogPolicy < GraphQL::Api::Policy
   def read?(*)
-    ctx[:test_key].nil?
+    !user.nil?
   end
 
   def destroy?(*)
-    ctx[:test_key].nil?
+    !user.nil?
   end
 
   def create?(*)
-    ctx[:test_key].nil?
+    !user.nil?
   end
 
   def update?(*)
-    ctx[:test_key].nil?
+    !user.nil?
   end
 
   def access_field?(_object, field)

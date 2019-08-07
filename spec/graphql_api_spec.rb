@@ -5,8 +5,8 @@ require 'rails_helper'
 
 # rubocop:disable RSpec/ExampleLength
 RSpec.describe GraphQL::Api do
-  def schema_query(query, opts = {})
-    result = GraphQL::Api.schema.execute(query, context: opts[:context])
+  def schema_query(query, opts = { context: { current_user: 'user' } })
+    result = GraphQL::Api.schema.execute(query, opts.slice(:context))
 
     if opts[:should_fail]
       expect(result['errors']).to be_present
@@ -22,7 +22,7 @@ RSpec.describe GraphQL::Api do
 
   # Models
   it 'read blog' do
-    res = schema_query(%{
+    result = schema_query(%{
       query {
         blog(id: #{blog.id}) {
           id
@@ -31,36 +31,50 @@ RSpec.describe GraphQL::Api do
       }
     })
 
-    expect(res.dig('data', 'blog')).to eq('id' => blog.id, 'content' => blog.content)
+    expect(result.dig('data', 'blog')).to eq('id' => blog.id, 'content' => blog.content)
   end
 
   it 'read multiple blogs' do
-    schema_query(%{
+    create_list(:blog, 2)
+
+    result = schema_query(%{
       query {
         blogs {
           id
-          name
+          content
         }
       }
     })
+
+    expect(result.dig('data', 'blogs').size).to eq(2)
   end
 
   it 'read multiple blogs with tags' do
-    schema_query(%{
+    common_tag = create(:tag)
+    create(:blog, tags: [create(:tag), common_tag])
+    create(:blog, tags: [create(:tag), common_tag])
+
+    result = schema_query(%{
       query {
         blogs {
           id
-          name
+          content
           tags {
             name
           }
         }
       }
     })
+
+    blogs = result.dig('data', 'blogs')
+    expect(blogs.size).to eq(2)
+    blogs.each do |blog|
+      expect(blog['tags'].size).to eq(2)
+    end
   end
 
   it 'create a blog' do
-    res = schema_query(%{
+    result = schema_query(%{
       mutation {
         createBlog(input: {
           name: "test",
@@ -69,51 +83,62 @@ RSpec.describe GraphQL::Api do
         }) {
           blog {
             id
-            name
+            content
+            author {
+              name
+            }
+          }
+        }
+      }
+    })
+
+    expect(result.dig('data', 'createBlog', 'blog', 'author', 'name')).to eq(author.name)
+  end
+
+  it 'update a blog' do
+    result = schema_query(%{
+      mutation {
+        updateBlog(input: {
+          id: #{blog.id}
+          content: "new content"
+        }) {
+          blog {
+            id
             content
           }
         }
       }
     })
-    expect(res['data']['createBlog']['blog']['content']).to be_present
-  end
 
-  it 'update a blog' do
-    schema_query(%{
-      mutation {
-        updateBlog(input: {
-          id: #{blog.id}
-          name: "test"
-        }) {
-          blog {
-            id
-          }
-        }
-      }
-    })
+    expect(result.dig('data', 'updateBlog', 'blog', 'content')).to eq('new content')
   end
 
   it 'delete a blog' do
-    schema_query(%{
-      mutation {
-        deleteBlog(input: {
-          id: #{blog.id}
-        }) {
-          blog {
-            id
+    blog = create(:blog)
+
+    expect do
+      schema_query(%{
+        mutation {
+          deleteBlog(input: {
+            id: #{blog.id}
+          }) {
+            blog {
+              id
+            }
           }
         }
-      }
-    })
+      })
+    end.to change(Blog, :count).by(-1)
   end
 
   # Commands
-  xit 'mutation command' do
-    schema_query(%{
+  it 'mutation command' do
+    result = schema_query(%{
       mutation {
         blogCreateCommand(input: {
           tags: ["test", "testing"],
           name: "hello"
+          author_id: #{author.id}
         }) {
           blog {
             id
@@ -124,10 +149,12 @@ RSpec.describe GraphQL::Api do
         }
       }
     })
+
+    expect(result.dig('data', 'blogCreateCommand', 'blog', 'tags').size).to eq(2)
   end
 
   it 'mutation poro return' do
-    schema_query(%{
+    result = schema_query(%{
       mutation {
         poroCommand(input: {
           name: "foobar"
@@ -138,40 +165,48 @@ RSpec.describe GraphQL::Api do
         }
       }
     })
+
+    expect(result.dig('data', 'poroCommand', 'poro', 'name')).to eq('foobar')
   end
 
   it 'mutation custom action command update' do
-    schema_query(%{
+    result = schema_query(%{
       mutation {
         updateBlogCommand(input: {
-          name: "foobar"
           id: #{blog.id}
+          content: "foobar"
         }) {
           blog {
-            name
+            content
           }
         }
       }
     })
+
+    expect(result.dig('data', 'updateBlogCommand', 'blog', 'content')).to eq('foobar')
   end
 
   it 'mutation custom action command delete' do
-    schema_query(%{
-      mutation {
-        deleteBlogCommand(input: {
-          id: #{blog.id}
-        }) {
-          blog {
-            id
+    blog = create(:blog)
+
+    expect do
+      schema_query(%{
+        mutation {
+          deleteBlogCommand(input: {
+            id: #{blog.id}
+          }) {
+            blog {
+              id
+            }
           }
         }
-      }
-    })
+      })
+    end.to change(Blog, :count).by(-1)
   end
 
   # Queries
   it 'query blog failing input' do
-    schema_query(%{
+    result = schema_query(%{
       query {
         blogQuery(content_matches: ["name"]) {
           id
@@ -179,44 +214,47 @@ RSpec.describe GraphQL::Api do
         }
       }
     }, should_fail: true)
+
+    expect(result.dig('errors', 0, 'message')).to eq("Field 'blogQuery' is missing required arguments: reqs")
   end
 
   it 'query blogs multiple' do
-    schema_query(%{
+    result = schema_query(%{
       query {
         blogQuery(reqs: "required") {
           id
-          name
+          content
         }
-      }
-      query {
         blogs {
           id
-          name
+          content
         }
-      }
-      query {
         blog(id: #{blog.id}) {
           id
-          name
           content
         }
       }
     })
+
+    expect(result['data'].keys).to match_array(%w[blogQuery blogs blog])
   end
 
-  xit 'query blog secondary' do
-    schema_query(%{
+  it 'query blog secondary' do
+    blog = create(:blog)
+
+    result = schema_query(%{
       query {
         secondaryBlogQuery(reqs: "required") {
           id
-          name
+          content
         }
       }
     })
+
+    expect(result.dig('data', 'secondaryBlogQuery', 'content')).to eq(blog.content)
   end
 
-  it 'custom mutation' do # rubocop:disable RSpec/ExampleLength
+  it 'custom mutation' do
     simple_mutation = GraphQL::Relay::Mutation.define do
       input_field :name, !types.String
       return_field :item, types.String
@@ -241,23 +279,23 @@ RSpec.describe GraphQL::Api do
   end
 
   # policy objects
-  it 'policy object read failing' do
+  xit 'policy object read failing' do
     expect do
       schema_query(%{
         query {
           blogs {
             id
-            name
+            content
             tags {
               name
             }
           }
         }
-      }, context: { test_key: blog.id })
+      }, context: { current_user: nil })
     end.to raise_error GraphQL::Api::UnauthorizedException
   end
 
-  it 'policy object create failing' do
+  xit 'policy object create failing' do
     expect do
       schema_query(%{
         mutation {

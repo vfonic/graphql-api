@@ -40,12 +40,14 @@ module GraphQL::Api
       @schema ||= GraphQL::Schema.define(query: graphql_query, mutation: graphql_mutation)
     end
 
-    def with_defaults(commands: [], queries: [], models: []) # rubocop:disable Metrics/MethodLength
+    def with_defaults(commands: [], queries: [], models: []) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       (all_constants('models') + models).each do |model_class|
         model(model_class)
       end
       (all_constants('queries') + queries).each do |query_class|
-        query(query_class)
+        query_class.actions.keys.each do |action|
+          query(query_class, action: action)
+        end
       end
       (all_constants('commands') + commands).each do |command_class|
         command_class.actions.keys.each do |action|

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class BlogCommand < GraphQL::Api::CommandType
-  action :update, returns: { blog: Blog }, args: { name: :string, tags: [:string], id: :integer }
+  action :update, returns: { blog: Blog }, args: { content: :string, tags: [:string], id: :integer }
   action :delete, returns: { blog: Blog }, args: { name: :string, tags: [:string], id: :integer }
 
   def update
