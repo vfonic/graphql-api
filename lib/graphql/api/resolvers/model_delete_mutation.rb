@@ -13,7 +13,7 @@ module GraphQL::Api
         instance = @model.find(args[:id])
 
         policy = get_policy(ctx)
-        return policy.unauthorized(:create, instance, args) if policy && !policy.destroy?(instance, args)
+        return policy.unauthorized(:destroy, instance, args) if policy && !policy.destroy?(instance, args)
 
         instance.destroy!
         { key => instance }
