@@ -267,7 +267,7 @@ RSpec.describe GraphQL::Api do
     end
 
     schema = GraphQL::Schema.define(query: config.graphql_query, mutation: mutation)
-    schema.execute(%{
+    result = schema.execute(%{
       mutation {
         simpleMutation(input: {
           name: "hello"
@@ -276,6 +276,8 @@ RSpec.describe GraphQL::Api do
         }
       }
     })
+
+    expect(result.dig('data', 'simpleMutation', 'item')).to eq('hello')
   end
 
   # policy objects
@@ -396,7 +398,7 @@ RSpec.describe GraphQL::Api do
   end
 
   it 'cannot read blog name' do
-    data = schema_query(%{
+    result = schema_query(%{
       query {
         blog(id: #{blog.id}) {
           id
@@ -404,7 +406,7 @@ RSpec.describe GraphQL::Api do
         }
       }
     })
-    assert_nil data['data']['blog']['name']
+    expect(result['data']['blog']['name']).to be nil
   end
 end
 # rubocop:enable RSpec/ExampleLength
