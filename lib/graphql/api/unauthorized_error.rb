@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module GraphQL::Api
-  class UnauthorizedException < StandardError
+  class UnauthorizedError < StandardError
     attr_accessor :user, :action, :instance, :params
 
     def initialize(user = nil, action = nil, instance = nil, params = nil)

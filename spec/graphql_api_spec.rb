@@ -279,7 +279,9 @@ RSpec.describe GraphQL::Api do
   end
 
   # policy objects
-  xit 'policy object read failing' do
+  it 'policy object read failing' do
+    create(:blog)
+
     expect do
       schema_query(%{
         query {
@@ -292,10 +294,13 @@ RSpec.describe GraphQL::Api do
           }
         }
       }, context: { current_user: nil })
-    end.to raise_error GraphQL::Api::UnauthorizedException
+    end.to raise_error(
+      GraphQL::Api::UnauthorizedError,
+      'Cannot read Blog'
+    )
   end
 
-  xit 'policy object create failing' do
+  it 'policy object create failing' do
     expect do
       schema_query(%{
         mutation {
@@ -308,8 +313,11 @@ RSpec.describe GraphQL::Api do
             }
           }
         }
-      }, context: { test_key: blog.id })
-    end.to raise_error GraphQL::Api::UnauthorizedException
+      }, context: { current_user: nil })
+    end.to raise_error(
+      GraphQL::Api::UnauthorizedError,
+      'Cannot create Blog'
+    )
   end
 
   it 'policy object update failing' do
@@ -325,11 +333,16 @@ RSpec.describe GraphQL::Api do
             }
           }
         }
-      }, context: { test_key: blog.id })
-    end.to raise_error GraphQL::Api::UnauthorizedException
+      }, context: { current_user: nil })
+    end.to raise_error(
+      GraphQL::Api::UnauthorizedError,
+      'Cannot update Blog'
+    )
   end
 
   it 'policy object delete failing' do
+    blog = create(:blog)
+
     expect do
       schema_query(%{
         mutation {
@@ -341,8 +354,11 @@ RSpec.describe GraphQL::Api do
             }
           }
         }
-      }, context: { test_key: blog.id })
-    end.to raise_error GraphQL::Api::UnauthorizedException
+      }, context: { current_user: nil })
+    end.to raise_error(
+      GraphQL::Api::UnauthorizedError,
+      'Cannot destroy Blog'
+    )
   end
 
   it 'policy object query unauthorized' do
@@ -354,7 +370,10 @@ RSpec.describe GraphQL::Api do
           }
         }
       })
-    end.to raise_error GraphQL::Api::UnauthorizedException
+    end.to raise_error(
+      GraphQL::Api::UnauthorizedError,
+      'Cannot perform BlockedQuery'
+    )
   end
 
   it 'policy object command unauthorized' do
@@ -370,7 +389,10 @@ RSpec.describe GraphQL::Api do
           }
         }
       })
-    end.to raise_error GraphQL::Api::UnauthorizedException
+    end.to raise_error(
+      GraphQL::Api::UnauthorizedError,
+      'Cannot perform BlockedCommand'
+    )
   end
 
   it 'cannot read blog name' do

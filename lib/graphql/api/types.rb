@@ -36,14 +36,12 @@ module GraphQL::Api
           model_class.reflections.each do |name, association|
             association_type = object_types[association.class_name.constantize]
             unless association_type
-              if association.polymorphic?
-                association_type = GraphQL::UnionType.define do
-                  name 'WallableUnion'
-                  description 'Get WallableUnion'
-                  possible_types([object_types[Event], object_types[Headline], object_types[Place]])
-                end
-              else
-                raise("Association not found: #{association.class_name}")
+              raise("Association not found: #{association.class_name}") unless association.polymorphic?
+
+              association_type = GraphQL::UnionType.define do
+                name 'WallableUnion'
+                description 'Get WallableUnion'
+                possible_types([object_types[Event], object_types[Headline], object_types[Place]])
               end
             end
 
