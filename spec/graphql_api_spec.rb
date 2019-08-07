@@ -26,12 +26,12 @@ RSpec.describe GraphQL::Api do
       query {
         blog(id: #{blog.id}) {
           id
-          name
+          content
         }
       }
     })
 
-    # expect(res.dig('data', 'blog')).to eq('id' => blog.id, 'name' => blog.name)
+    expect(res.dig('data', 'blog')).to eq('id' => blog.id, 'content' => blog.content)
   end
 
   it 'read multiple blogs' do
