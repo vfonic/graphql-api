@@ -26,5 +26,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'guard-rubocop'
   spec.add_development_dependency 'pry-rails'
   spec.add_development_dependency 'rspec-rails'
-  spec.add_development_dependency 'sqlite3', '~> 1.3.6'
+  spec.add_development_dependency 'sqlite3'
 end
