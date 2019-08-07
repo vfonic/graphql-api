@@ -27,7 +27,7 @@ module GraphQL::Api
       @schema ||= GraphQL::Schema.define(
         query: graphql_query,
         mutation: graphql_mutation,
-        resolve_type: lambda { |obj, ctx| @types[obj.class] }
+        resolve_type: ->(obj, _ctx) { @types[obj.class] }
       )
     end
 

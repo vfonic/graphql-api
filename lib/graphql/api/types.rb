@@ -5,7 +5,7 @@ module GraphQL::Api
     include Helpers
 
     # Create the query type for the given model class.
-    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+    # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
     def model_query_type(model_class, fields: {}, resolver_class: nil)
       object_types = @types
 
@@ -57,7 +57,7 @@ module GraphQL::Api
         end
       end
     end
-    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
+    # rubocop:enable  Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
 
     # Create the create mutation type for the given model class.
     # rubocop:disable Metrics/AbcSize, Metrics/MethodLength

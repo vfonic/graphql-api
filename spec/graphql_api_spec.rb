@@ -372,7 +372,7 @@ RSpec.describe GraphQL::Api do
       })
     end.to raise_error(
       GraphQL::Api::UnauthorizedError,
-      'Cannot perform BlockedQuery'
+      'Cannot execute BlockedQuery'
     )
   end
 
