@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'graphql/api/helpers'
-require 'graphql'
-
 module GraphQL::Api
   module Types # rubocop:disable Metrics/ModuleLength
     include Helpers

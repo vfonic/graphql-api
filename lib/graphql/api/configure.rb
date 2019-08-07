@@ -1,18 +1,5 @@
 # frozen_string_literal: true
 
-require 'graphql/api/resolvers/model_find_query'
-require 'graphql/api/resolvers/model_list_query'
-require 'graphql/api/resolvers/query_object_query'
-require 'graphql/api/resolvers/field'
-require 'graphql/api/resolvers/model_create_mutation'
-require 'graphql/api/resolvers/model_delete_mutation'
-require 'graphql/api/resolvers/model_update_mutation'
-require 'graphql/api/resolvers/command_mutation'
-require 'graphql/api/types'
-require 'graphql/api/helpers'
-require 'graphql/api/mutation_description'
-require 'graphql/api/query_description'
-
 include GraphQL::Api::Helpers # rubocop:disable Style/MixinUsage
 
 module GraphQL::Api

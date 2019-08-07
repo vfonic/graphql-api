@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'graphql/api/resolvers/helpers'
-
 module GraphQL::Api
   module Resolvers
     class Field

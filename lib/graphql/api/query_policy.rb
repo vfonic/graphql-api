@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'graphql/api/unauthorized_exception'
-
 module GraphQL::Api
   class QueryPolicy
     attr_reader :ctx

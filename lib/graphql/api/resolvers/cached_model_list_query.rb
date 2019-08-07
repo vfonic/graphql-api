@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'graphql/api/resolvers/helpers'
-require 'graphql/api/resolvers/model_list_query'
-
 module GraphQL::Api
   module Resolvers
     class CachedModelListQuery < ModelListQuery
