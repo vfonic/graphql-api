@@ -34,7 +34,16 @@ module GraphQL::Api
 
         if model_class.respond_to?(:reflections)
           model_class.reflections.each do |name, association|
-            association_type = object_types[association.class_name.constantize]
+            association_type = if association.class_name == 'Resource'
+              GraphQL::UnionType.define do
+                name 'ResourceUnion'
+                description 'Get ResourceUnion'
+                possible_types(Rolify.resource_types.map{ |model| object_types[model.constantize] })
+              end
+            else
+              object_types[association.class_name.safe_constantize]
+            end
+
             unless association_type
               raise("Association not found: #{association.class_name}") unless association.polymorphic?
 
